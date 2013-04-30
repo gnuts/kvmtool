@@ -34,9 +34,9 @@ PRESEEDSERVER="http://10.17.17.22"
 OTHERSETUP="\
 mirror/http/proxy=http://10.17.17.22:8080\
 "
-export http_proxy="http://10.17.17.22:8080"
-export https_proxy="http://10.17.17.22:8080"
-export ftp_proxy="http://10.17.17.22:8080"
+http_proxy="http://10.17.17.22:8080"
+https_proxy="http://10.17.17.22:8080"
+ftp_proxy="http://10.17.17.22:8080"
 
 #####
 name="$1"
