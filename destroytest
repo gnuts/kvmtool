@@ -1,0 +1,4 @@
+#!/bin/bash
+
+virsh -c ziolkowski "destroy test;undefine test;vol-delete test --pool vg0"
+
