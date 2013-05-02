@@ -52,7 +52,7 @@ function die {
     exit 1
 }
 
-CONFVARS="LOCATION PRESEEDSOURCEDIR PRESEEDTARGET PRESEEDSERVER KVMHOST DNSDOMAIN VCPUS RAM SIZE PVNAME GRAPHICS NETWORK PRESEEDNAME OTHERSETUP NAME NETWORK HOSTNETWORKSETUP"
+CONFVARS="LOCATION PRESEEDSOURCEDIR PRESEEDTARGET PRESEEDSERVER KVMHOST DNSDOMAIN VCPUS RAM SIZE PVNAME GRAPHICS NETWORK PRESEEDNAME DEFAULTSETUP OTHERSETUP NAME NETWORK HOSTNETWORKSETUP CPU OSTYPE VIRTTYPE"
 function output_template {
 cat << 'EOL'
 #
@@ -74,6 +74,10 @@ ftp_proxy="http://10.17.17.22:8080"
 #
 
 KVMHOST="ziolkowski"
+CPU="host"
+VIRTTYPE="kvm"
+OSTYPE="linux"
+
 
 #
 # default kvm domain settings
@@ -86,14 +90,15 @@ PVNAME="vg0"
 GRAPHICS="vnc"
 NETWORK="network=intranet"
 PRESEEDNAME="simpleserver"
-OTHERSETUP="\
-    mirror/http/proxy=http://10.17.17.22:8080\
-    "
+DEFAULTSETUP="\
+preseed/late_command=mkdir /target/root/.ssh;echo ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCwi2I1fJOCFC9NXE6CV2o0fHpdZwM9+B8IVPlJFBe5wjyhQ6M35qwa21bfmDetshriYHN3MhFKLUajVLEGvEM37oxLEN+/nLepnO3suBd0PW5Y8aEnk9HGTXw0dntJd4OeFUMefRyy/pcfFxbhXwkjnPHI9tuod3LTfzvrV4ribLxtBFFCoDLecCSCjaG0ykaVbj7kl7BkHXFhACmwaKOhekJPuHxWlFm8rU1ESG8QyCYqRYCVRfIvcHH+kqjpkk1QxwRaF1PXzXkM2mhMti/ywBmTEa3syKswA8Hap29QD1AfD1o6Brc4UNgeO4OcHCsgJbv9U0GXhjCOqn56jDHX /home/nuts/.ssh/id_rsa >/target/root/.ssh/authorized_keys \
+"
 
 #
 # host specific configuration
 #
-NAME=testdomain
+#NAME=nameofvirtualmachine
+NAME=
 NETWORK="network=intranet"
 HOSTNETWORKSETUP="\
 interface=eth0 \
@@ -103,7 +108,12 @@ netcfg/get_ipaddress=10.17.17.249 \
 netcfg/get_netmask=255.255.255.0 \
 netcfg/get_gateway=10.17.17.2 \
 netcfg/confirm_static=true \
+mirror/http/proxy=http://10.17.17.22:8080 \
 "
+OTHERSETUP="\
+passwd/root-password=aiGhi3poodeighu
+"
+
 
 EOL
 }
@@ -118,6 +128,64 @@ function sanitycheck_create {
         fi
     done
     D "configuration is valid"
+}
+
+
+function create_domain {
+    set -e 
+
+    D "checking whether $NAME already exists..."
+    # check whether a $name domain already exists
+    if virsh -c "$KVMHOST" domid "$NAME" >/dev/null 2>&1; then
+        die "there already is a domain called $NAME bailing out"
+    fi
+
+    # check whether a $name volume already exists
+    if virsh -c "$KVMHOST" vol-path --pool "$PVNAME" "$NAME" >/dev/null 2>&1; then
+        die "there already is a volume called $NAME bailing out"
+    fi
+
+    preseedcfg="$PRESEEDSOURCEDIR/$PRESEEDNAME.cfg" 
+    preseedurl="$PRESEEDSERVER/$PRESEEDNAME.cfg"
+
+    D "checking preseed file..."
+    if [ ! -f "$preseedcfg" ]; then
+        die "could not find preseed file $preseedcfg"
+    fi
+
+    if [ "$ASKBEFORECREATE" != "NO" ]; then
+
+    cat <<EOL
+
+    going to create domain "$NAME" (cpus:$VCPUS, ram:${RAM}kb, disk:${SIZE}gb) on PV $PVNAME
+    press ENTER to continue or CTRL-C to abort"
+
+EOL
+    read
+    fi 
+
+    D "copy preseed file to webserver..."
+    rsync -a "$preseedcfg" "$PRESEEDTARGET"
+
+
+    D "create domain $NAME"
+    time virt-install \
+        --connect="$KVMHOST" \
+        --name="$NAME" \
+        --ram="$RAM" \
+        --vcpus="$VCPUS" \
+        --cpu="$CPU" \
+        --os-type="$OSTYPE" \
+        --virt-type="$VIRTTYPE" \
+        --noautoconsole \
+        --wait=-1 \
+        --hvm \
+        --network="$NETWORK" \
+        --graphics="$GRAPHICS" \
+        --disk="/dev/$PVNAME/$NAME,size=$SIZE" \
+        --location="$LOCATION" \
+        --extra-args="auto=true hostname=$NAME domain=$DNSDOMAIN $DEFAULTSETUP $HOSTNETWORKSETUP $OTHERSETUP url=$preseedurl"
+
 }
 
 function cmd_create {
@@ -138,18 +206,20 @@ function cmd_create {
         die "error: $defaultconf not found"
     fi
 
-    # first load default config then deomain config
+    # first load default config then domain config
     source "$defaultconf"
     source "$domainconf"
 
     D "configuration loaded"
+    # make sure all vars are available...
     sanitycheck_create
-
+    create_domain
 }
 
 function cmd_wipe {
     D "wipe mode"
     domain="$1"
+    #virsh -c ziolkowski "destroy test;undefine test;vol-delete test --pool vg0"
 }
 
 function D {
