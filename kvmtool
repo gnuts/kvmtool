@@ -1,0 +1,188 @@
+#!/bin/bash
+
+
+#
+# create kvm domain
+# * default config
+# * domain config
+# * preseed file
+#
+# delete kvm domain
+# * destroy and undefine domain
+# * destroy and undefine lv
+#
+#
+# example use:
+# kvmtool create mydomain from mydefaultconfig
+# kvmtool wipe mydomain
+#
+
+
+function usage {
+
+if [ -n "$1" ]; then
+    echo -e "\n$1\n\n"
+fi
+
+cat <<EOL
+
+usage:
+
+kvmtool create <domain> like <config>
+    creates a domain from a default config
+
+kvmtool wipe <domain>
+    deletes a domain and its logical volume
+
+kvmtool template
+    outputs a default configuration to stdout
+
+<domain> and <config> are both config files like that from the template command
+
+EOL
+
+exit 0
+}
+
+
+function die {
+    echo
+    echo "$*"
+    echo
+    exit 1
+}
+
+CONFVARS="LOCATION PRESEEDSOURCEDIR PRESEEDTARGET PRESEEDSERVER KVMHOST DNSDOMAIN VCPUS RAM SIZE PVNAME GRAPHICS NETWORK PRESEEDNAME OTHERSETUP NAME NETWORK HOSTNETWORKSETUP"
+function output_template {
+cat << 'EOL'
+#
+# global/default options
+#
+LOCATION="http://ftp.debian.org/debian/dists/squeeze/main/installer-amd64/"
+PRESEEDSOURCEDIR="./preseeds"
+PRESEEDTARGET="/var/www/"
+PRESEEDSERVER="http://10.17.17.22"
+
+# use proxy:
+http_proxy="http://10.17.17.22:8080"
+https_proxy="http://10.17.17.22:8080"
+ftp_proxy="http://10.17.17.22:8080"
+
+
+#
+# host settings
+#
+
+KVMHOST="ziolkowski"
+
+#
+# default kvm domain settings
+#
+DNSDOMAIN="int.druidenkacke.de"
+VCPUS=1
+RAM=1024
+SIZE=5
+PVNAME="vg0"
+GRAPHICS="vnc"
+NETWORK="network=intranet"
+PRESEEDNAME="simpleserver"
+OTHERSETUP="\
+    mirror/http/proxy=http://10.17.17.22:8080\
+    "
+
+#
+# host specific configuration
+#
+NAME=testdomain
+NETWORK="network=intranet"
+HOSTNETWORKSETUP="\
+interface=eth0 \
+netcfg/disable_dhcp=true \
+netcfg/get_nameservers=10.17.17.2 \
+netcfg/get_ipaddress=10.17.17.249 \
+netcfg/get_netmask=255.255.255.0 \
+netcfg/get_gateway=10.17.17.2 \
+netcfg/confirm_static=true \
+"
+
+EOL
+}
+
+
+
+function sanitycheck_create {
+    for v in $CONFVARS; do
+        x=$(eval echo -n "\$$v")
+        if [ -z "$x" ]; then
+            die "config error: $v must must be set"
+        fi
+    done
+    D "configuration is valid"
+}
+
+function cmd_create {
+
+    domain="$1"
+    default="$3" 
+    [ "$2" == "like" ] || usage "create command syntax error"
+
+    # load domain config
+    domainconf="$KVMTOOLCONFIGDIR/$domain.conf"
+    defaultconf="$KVMTOOLCONFIGDIR/$default.conf"
+
+    if   [ ! -f "$domainconf" ]; then
+        die "error: $domainconf not found"
+    fi
+
+    if   [ ! -f "$defaultconf" ]; then
+        die "error: $defaultconf not found"
+    fi
+
+    # first load default config then deomain config
+    source "$defaultconf"
+    source "$domainconf"
+
+    D "configuration loaded"
+    sanitycheck_create
+
+}
+
+function cmd_wipe {
+    D "wipe mode"
+    domain="$1"
+}
+
+function D {
+    echo "$*" 1>&2
+}
+
+#
+# main
+#
+mode="$1"
+shift
+
+if [ -z "$KVMTOOLCONFIGDIR" ]; then
+    KVMTOOLCONFIGDIR="configs"
+fi
+
+
+case $mode in
+    create)
+        D "using config dir $KVMTOOLCONFIGDIR"
+        cmd_create "$1" "$2" "$3"
+        exit 0
+        ;;
+    wipe)
+        D "using config dir $KVMTOOLCONFIGDIR"
+        cmd_wipe "$1"
+        exit 0
+        ;;
+    template)
+        output_template
+        exit 0
+        ;;
+    *)
+        usage
+        ;;
+esac
