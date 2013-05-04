@@ -11,10 +11,12 @@
 # * destroy and undefine domain
 # * destroy and undefine lv
 #
+# install salt on various OS Distributions
+#
 #
 # example use:
 # kvmtool create mydomain from mydefaultconfig
-# kvmtool wipe mydomain
+# kvmtool wipe mydomain like mydefaultconfig
 #
 
 
@@ -34,8 +36,12 @@ kvmtool create <domain> like <config>
 kvmtool wipe <domain> like <config>
     deletes a domain and its logical volume
 
+kvmtool salt <domain> like <config>
+    installs salt on the domain
+
 kvmtool template
-    outputs a default configuration to stdout
+    outputs a default.conf configuration to stdout
+    put this in $KVMTOOLCONFIGDIR/ (env var: KVMTOOLCONFIGDIR) 
 
 <domain> and <config> are both config files like that from the template command
 
@@ -52,7 +58,7 @@ function die {
     exit 1
 }
 
-CONFVARS="LOCATION PRESEEDSOURCEDIR PRESEEDTARGET PRESEEDSERVER KVMHOST DNSDOMAIN VCPUS RAM SIZE PVNAME GRAPHICS NETWORK PRESEEDNAME DEFAULTSETUP OTHERSETUP NAME NETWORK HOSTNETWORKSETUP CPU OSTYPE VIRTTYPE ASKBEFORECREATE ASKBEFOREWIPE"
+CONFVARS="LOCATION PRESEEDSOURCEDIR PRESEEDTARGET PRESEEDSERVER KVMHOST DNSDOMAIN VCPUS RAM SIZE PVNAME GRAPHICS NETWORK PRESEEDNAME DEFAULTSETUP OTHERSETUP NAME NETWORK HOSTNETWORKSETUP CPU OSTYPE VIRTTYPE ASKBEFORECREATE ASKBEFOREWIPE ASKBEFORESALT SALTMETHOD IP SALTMASTER"
 function output_template {
 cat << 'EOL'
 #
@@ -62,10 +68,13 @@ LOCATION="http://ftp.debian.org/debian/dists/squeeze/main/installer-amd64/"
 PRESEEDSOURCEDIR="./preseeds"
 PRESEEDTARGET="/var/www/"
 PRESEEDSERVER="http://10.17.17.22"
+SALTMASTER="10.17.17.22"
 
 # set to exactly "NO", to suppress manual interaction
 ASKBEFORECREATE=yes
 ASKBEFOREWIPE=yes
+ASKBEFORESALT=yes
+
 # use proxy:
 http_proxy="http://10.17.17.22:8080"
 https_proxy="http://10.17.17.22:8080"
@@ -93,21 +102,13 @@ PVNAME="vg0"
 GRAPHICS="vnc"
 NETWORK="network=intranet"
 PRESEEDNAME="simpleserver"
-DEFAULTSETUP="\
-preseed/late_command=\"mkdir /target/root/.ssh;echo ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCwi2I1fJOCFC9NXE6CV2o0fHpdZwM9+B8IVPlJFBe5wjyhQ6M35qwa21bfmDetshriYHN3MhFKLUajVLEGvEM37oxLEN+/nLepnO3suBd0PW5Y8aEnk9HGTXw0dntJd4OeFUMefRyy/pcfFxbhXwkjnPHI9tuod3LTfzvrV4ribLxtBFFCoDLecCSCjaG0ykaVbj7kl7BkHXFhACmwaKOhekJPuHxWlFm8rU1ESG8QyCYqRYCVRfIvcHH+kqjpkk1QxwRaF1PXzXkM2mhMti/ywBmTEa3syKswA8Hap29QD1AfD1o6Brc4UNgeO4OcHCsgJbv9U0GXhjCOqn56jDHX /home/nuts/.ssh/id_rsa >/target/root/.ssh/authorized_keys\" \
-"
-
-#
-# host specific configuration
-#
-#NAME=nameofvirtualmachine
-NAME=
+SALTMETHOD="squeeze"
 NETWORK="network=intranet"
 HOSTNETWORKSETUP="\
 interface=eth0 \
 netcfg/disable_dhcp=true \
 netcfg/get_nameservers=10.17.17.2 \
-netcfg/get_ipaddress=10.17.17.249 \
+netcfg/get_ipaddress=\$IP \
 netcfg/get_netmask=255.255.255.0 \
 netcfg/get_gateway=10.17.17.2 \
 netcfg/confirm_static=true \
@@ -116,6 +117,18 @@ mirror/http/proxy=http://10.17.17.22:8080 \
 OTHERSETUP="\
 passwd/root-password=aiGhi3poodeighu
 "
+DEFAULTSETUP="\
+preseed/late_command=\"mkdir /target/root/.ssh;echo ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCwi2I1fJOCFC9NXE6CV2o0fHpdZwM9+B8IVPlJFBe5wjyhQ6M35qwa21bfmDetshriYHN3MhFKLUajVLEGvEM37oxLEN+/nLepnO3suBd0PW5Y8aEnk9HGTXw0dntJd4OeFUMefRyy/pcfFxbhXwkjnPHI9tuod3LTfzvrV4ribLxtBFFCoDLecCSCjaG0ykaVbj7kl7BkHXFhACmwaKOhekJPuHxWlFm8rU1ESG8QyCYqRYCVRfIvcHH+kqjpkk1QxwRaF1PXzXkM2mhMti/ywBmTEa3syKswA8Hap29QD1AfD1o6Brc4UNgeO4OcHCsgJbv9U0GXhjCOqn56jDHX /home/nuts/.ssh/id_rsa >/target/root/.ssh/authorized_keys\" \
+"
+
+#
+# host specific configuration
+# put this in host specific files
+# you may have to overwrite other vars from the global config here too!
+#
+#NAME=nameofvirtualmachine
+NAME=
+IP=
 EOL
 }
 
@@ -234,6 +247,7 @@ EOL
     virsh -c "$KVMHOST" "destroy $NAME;undefine $NAME;vol-delete $NAME --pool $PVNAME"
 
 }
+
 function cmd_wipe {
     D "wipe mode $*"
     domain="$1"
@@ -260,7 +274,81 @@ function cmd_wipe {
     # make sure all vars are available...
     sanitycheck
     wipe_domain
- }
+}
+
+function salt_squeeze {
+    set -e
+    script=$(mktemp)
+    cat >"$script" << EOL
+#!/bin/bash
+
+set -e
+echo "deb http://debian.saltstack.com/debian squeeze-saltstack main" >/etc/apt/sources.list.d/salt.list 
+echo "deb http://backports.debian.org/debian-backports squeeze-backports main contrib non-free" >>/etc/apt/sources.list.d/salt.list
+wget -q -O- "http://debian.saltstack.com/debian-salt-team-joehealy.gpg.key" | apt-key add -
+apt-get update
+apt-get -y install salt-minion
+
+perl -p -i -e 's/^\#master: salt/master: $SALTMASTER/' /etc/salt/minion
+EOL
+    D "created script $script"
+    ssh="ssh -Cl root $IP"
+    $ssh 'f=$(mktemp) && cat >$f && echo "remote script: $f" && chmod +x $f && $f' < $script
+}
+
+function salt_domain {
+    set -e
+
+    if [ "$ASKBEFORESALT" != "NO" ]; then
+
+    cat <<EOL
+
+    going to install salt on domain "$NAME" (IP $IP) with master $SALTMASTER
+    salting method: $SALTMETHOD
+    press ENTER to continue or CTRL-C to abort"
+
+EOL
+    read
+    fi 
+
+    case $SALTMETHOD in
+        squeeze)
+            salt_squeeze
+            ;;
+        *)
+            die "unknown salting method"
+            ;;
+    esac
+
+}
+
+function cmd_salt {
+    D "salt mode $*"
+    domain="$1"
+    default="$3" 
+    [ "$2" == "like" ] || usage "salt command syntax error"
+
+    # load domain config
+    domainconf="$KVMTOOLCONFIGDIR/$domain.conf"
+    defaultconf="$KVMTOOLCONFIGDIR/$default.conf"
+
+    if   [ ! -f "$domainconf" ]; then
+        die "error: $domainconf not found"
+    fi
+
+    if   [ ! -f "$defaultconf" ]; then
+        die "error: $defaultconf not found"
+    fi
+
+    # first load default config then domain config
+    source "$defaultconf"
+    source "$domainconf"
+
+    D "configuration loaded"
+    # make sure all vars are available...
+    sanitycheck
+    salt_domain
+}
 
 function D {
     echo "$*" 1>&2
@@ -279,14 +367,15 @@ fi
 
 case $mode in
     create)
-        D "using config dir $KVMTOOLCONFIGDIR"
         cmd_create "$1" "$2" "$3"
         exit 0
         ;;
     wipe)
-        D "using config dir $KVMTOOLCONFIGDIR"
         cmd_wipe "$1" "$2" "$3"
         exit 0
+        ;;
+    salt)
+        cmd_salt "$1" "$2" "$3"
         ;;
     template)
         output_template
