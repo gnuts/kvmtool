@@ -31,7 +31,7 @@ usage:
 kvmtool create <domain> like <config>
     creates a domain from a default config
 
-kvmtool wipe <domain>
+kvmtool wipe <domain> like <config>
     deletes a domain and its logical volume
 
 kvmtool template
@@ -52,7 +52,7 @@ function die {
     exit 1
 }
 
-CONFVARS="LOCATION PRESEEDSOURCEDIR PRESEEDTARGET PRESEEDSERVER KVMHOST DNSDOMAIN VCPUS RAM SIZE PVNAME GRAPHICS NETWORK PRESEEDNAME DEFAULTSETUP OTHERSETUP NAME NETWORK HOSTNETWORKSETUP CPU OSTYPE VIRTTYPE"
+CONFVARS="LOCATION PRESEEDSOURCEDIR PRESEEDTARGET PRESEEDSERVER KVMHOST DNSDOMAIN VCPUS RAM SIZE PVNAME GRAPHICS NETWORK PRESEEDNAME DEFAULTSETUP OTHERSETUP NAME NETWORK HOSTNETWORKSETUP CPU OSTYPE VIRTTYPE ASKBEFORECREATE ASKBEFOREWIPE"
 function output_template {
 cat << 'EOL'
 #
@@ -63,6 +63,9 @@ PRESEEDSOURCEDIR="./preseeds"
 PRESEEDTARGET="/var/www/"
 PRESEEDSERVER="http://10.17.17.22"
 
+# set to exactly "NO", to suppress manual interaction
+ASKBEFORECREATE=yes
+ASKBEFOREWIPE=yes
 # use proxy:
 http_proxy="http://10.17.17.22:8080"
 https_proxy="http://10.17.17.22:8080"
@@ -113,14 +116,12 @@ mirror/http/proxy=http://10.17.17.22:8080 \
 OTHERSETUP="\
 passwd/root-password=aiGhi3poodeighu
 "
-
-
 EOL
 }
 
 
 
-function sanitycheck_create {
+function sanitycheck {
     for v in $CONFVARS; do
         x=$(eval echo -n "\$$v")
         if [ -z "$x" ]; then
@@ -157,7 +158,7 @@ function create_domain {
 
     cat <<EOL
 
-    going to create domain "$NAME" (cpus:$VCPUS, ram:${RAM}kb, disk:${SIZE}gb) on PV $PVNAME
+    going to create domain "$NAME" (cpus:$VCPUS, ram:${RAM}kb, disk:${SIZE}gb) on PV $PVNAME on host $KVMHOST
     press ENTER to continue or CTRL-C to abort"
 
 EOL
@@ -212,15 +213,54 @@ function cmd_create {
 
     D "configuration loaded"
     # make sure all vars are available...
-    sanitycheck_create
+    sanitycheck
     create_domain
 }
 
-function cmd_wipe {
-    D "wipe mode"
-    domain="$1"
-    #virsh -c ziolkowski "destroy test;undefine test;vol-delete test --pool vg0"
+function wipe_domain {
+    set -e
+
+    if [ "$ASKBEFOREWIPE" != "NO" ]; then
+
+    cat <<EOL
+
+    going to completely wipe domain "$NAME" (cpus:$VCPUS, ram:${RAM}kb, disk:${SIZE}gb) from PV $PVNAME on host $KVMHOST
+    press ENTER to continue or CTRL-C to abort"
+
+EOL
+    read
+    fi 
+
+    virsh -c "$KVMHOST" "destroy $NAME;undefine $NAME;vol-delete $NAME --pool $PVNAME"
+
 }
+function cmd_wipe {
+    D "wipe mode $*"
+    domain="$1"
+    default="$3" 
+    [ "$2" == "like" ] || usage "wipe command syntax error"
+
+    # load domain config
+    domainconf="$KVMTOOLCONFIGDIR/$domain.conf"
+    defaultconf="$KVMTOOLCONFIGDIR/$default.conf"
+
+    if   [ ! -f "$domainconf" ]; then
+        die "error: $domainconf not found"
+    fi
+
+    if   [ ! -f "$defaultconf" ]; then
+        die "error: $defaultconf not found"
+    fi
+
+    # first load default config then domain config
+    source "$defaultconf"
+    source "$domainconf"
+
+    D "configuration loaded"
+    # make sure all vars are available...
+    sanitycheck
+    wipe_domain
+ }
 
 function D {
     echo "$*" 1>&2
@@ -245,7 +285,7 @@ case $mode in
         ;;
     wipe)
         D "using config dir $KVMTOOLCONFIGDIR"
-        cmd_wipe "$1"
+        cmd_wipe "$1" "$2" "$3"
         exit 0
         ;;
     template)
