@@ -91,7 +91,7 @@ GRAPHICS="vnc"
 NETWORK="network=intranet"
 PRESEEDNAME="simpleserver"
 DEFAULTSETUP="\
-preseed/late_command=mkdir /target/root/.ssh;echo ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCwi2I1fJOCFC9NXE6CV2o0fHpdZwM9+B8IVPlJFBe5wjyhQ6M35qwa21bfmDetshriYHN3MhFKLUajVLEGvEM37oxLEN+/nLepnO3suBd0PW5Y8aEnk9HGTXw0dntJd4OeFUMefRyy/pcfFxbhXwkjnPHI9tuod3LTfzvrV4ribLxtBFFCoDLecCSCjaG0ykaVbj7kl7BkHXFhACmwaKOhekJPuHxWlFm8rU1ESG8QyCYqRYCVRfIvcHH+kqjpkk1QxwRaF1PXzXkM2mhMti/ywBmTEa3syKswA8Hap29QD1AfD1o6Brc4UNgeO4OcHCsgJbv9U0GXhjCOqn56jDHX /home/nuts/.ssh/id_rsa >/target/root/.ssh/authorized_keys \
+preseed/late_command=\"mkdir /target/root/.ssh;echo ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCwi2I1fJOCFC9NXE6CV2o0fHpdZwM9+B8IVPlJFBe5wjyhQ6M35qwa21bfmDetshriYHN3MhFKLUajVLEGvEM37oxLEN+/nLepnO3suBd0PW5Y8aEnk9HGTXw0dntJd4OeFUMefRyy/pcfFxbhXwkjnPHI9tuod3LTfzvrV4ribLxtBFFCoDLecCSCjaG0ykaVbj7kl7BkHXFhACmwaKOhekJPuHxWlFm8rU1ESG8QyCYqRYCVRfIvcHH+kqjpkk1QxwRaF1PXzXkM2mhMti/ywBmTEa3syKswA8Hap29QD1AfD1o6Brc4UNgeO4OcHCsgJbv9U0GXhjCOqn56jDHX /home/nuts/.ssh/id_rsa >/target/root/.ssh/authorized_keys\" \
 "
 
 #
