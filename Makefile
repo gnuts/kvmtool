@@ -43,7 +43,7 @@ clean:
 
 
 test:
-	@perl -wc bin/kvmtool
+	@echo "no tests available"
 
 
 update-doc:
@@ -54,10 +54,12 @@ install: clean update-doc
 	mkdir -p $(INST_BINDIR)
 	mkdir -p $(INST_SBINDIR)
 	mkdir -p $(INST_ETCDIR)
+	mkdir -p $(INST_ETCDIR)/preseeds
 	# binaries
 	install -g root -o root -m 755 bin/kvmtool $(INST_SBINDIR)/
 	# configuration
-	cp -a etc/*cfg $(INST_ETCDIR)/preseed
+	cp -a etc/debian_squeeze_default.cfg $(INST_ETCDIR)/preseeds
+	cp -a etc/squeeze_example_preseed.cfg $(INST_ETCDIR)/preseeds
 	chown -vR root:root $(INST_ETCDIR)/
 	chmod -vR u=Xrw,go= $(INST_ETCDIR)/
 
