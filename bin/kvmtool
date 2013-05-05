@@ -60,24 +60,38 @@ function die {
     exit 1
 }
 
+# all vars in CONFVARS must be set when creating or wiping, or sanitycheck() will bail out
 CONFVARS="LOCATION PRESEEDSOURCEDIR PRESEEDTARGET PRESEEDSERVER KVMHOST DNSDOMAIN VCPUS RAM SIZE PVNAME GRAPHICS NETWORK PRESEEDNAME LATESETUP OTHERSETUP NAME NETWORK HOSTNETWORKSETUP CPU OSTYPE VIRTTYPE ASKBEFORECREATE ASKBEFOREWIPE ASKBEFORESALT SALTMETHOD IP SALTMASTER LATESCRIPT PRESEEDFILES"
 function output_template {
 cat << 'EOL'
 #
 # global/default options
 #
+
+# LOCATION: installer location for webbased virt-install
 LOCATION="http://ftp.debian.org/debian/dists/squeeze/main/installer-amd64/"
+
+# PRESEEDSOURCEDIR: directory below /etc/kvmtool where preseed.cfg files are stored
 PRESEEDSOURCEDIR="preseeds"
+
+# PRESEEDTARGET: the selected preseed file, the latescript and all additional files will be copied there
+# this is done using rsync and can be a remote target. e.g. webuser@someserv.er:/srv/www/
 PRESEEDTARGET="/var/www/"
+
+# PRESEEDSERVER: URL of webserver path, where preseed and latefiles can be found
 PRESEEDSERVER="http://10.17.17.22"
+
+# SALTMASTER: IP/FQDN of saltmaster the minion shall use
 SALTMASTER="10.17.17.22"
 
 # set to exactly "NO", to suppress manual interaction
+# be very careful. you can fsck up your virtual machines without warning then
 ASKBEFORECREATE=yes
 ASKBEFOREWIPE=yes
 ASKBEFORESALT=yes
 
-# use proxy:
+# proxies to use when loading $LOCATION
+# this is not the proxy that will be used during installation in the guest!
 http_proxy="http://10.17.17.22:8080"
 https_proxy="http://10.17.17.22:8080"
 ftp_proxy="http://10.17.17.22:8080"
@@ -87,11 +101,14 @@ ftp_proxy="http://10.17.17.22:8080"
 # host settings
 #
 
+# hostname or alias of the KVM host system
 KVMHOST="ziolkowski"
+
+# basic kvm parameters, read virt-install manpage for possible values
 CPU="host"
 VIRTTYPE="kvm"
 OSTYPE="linux"
-
+GRAPHICS="vnc"
 
 #
 # default kvm domain settings
@@ -99,16 +116,18 @@ OSTYPE="linux"
 DNSDOMAIN="int.druidenkacke.de"
 VCPUS=1
 RAM=1024
-SIZE=5
-PVNAME="vg0"
-GRAPHICS="vnc"
-NETWORK="network=intranet"
 
-# PRESEEDNAME: preseed file name without .cfg
+# SIZE: size of logical volume. In gigabytes.
+SIZE=5
+
+# PVNAME: Name of physical volume to create guest logical volumes on.
+PVNAME="vg0"
+
+# PRESEEDNAME: preseed file name. without .cfg extension and path!
 PRESEEDNAME="debian_squeeze_default"
 
 # PRESEEDFILES: additional files to copy to the preseedserver
-# will be searched in config dir
+# will be searched in config dir. do not use paths! only filenames work for now.
 PRESEEDFILES="authorized_keys"
 
 # LATESCRIPT: script to transfer to remote host and run.
@@ -117,8 +136,16 @@ PRESEEDFILES="authorized_keys"
 # set to NO if you do not need that
 LATESCRIPT="latescript_squeeze.sh"
 
+
+# SALTMETHOD: Method to use when installing salt on a target.
+# possible values: "squeeze", "ubuntu" (still untested)
 SALTMETHOD="squeeze"
+
+# NETWORK: guest network hardware setup. read manual page of virt-install for details
 NETWORK="network=intranet"
+
+# HOSTNETWORKSETUP: network configuration for the guest. this is preseed syntax
+# also set guest system proxy here
 HOSTNETWORKSETUP="\
 interface=eth0 \
 netcfg/disable_dhcp=true \
@@ -129,7 +156,11 @@ netcfg/get_gateway=10.17.17.2 \
 netcfg/confirm_static=true \
 mirror/http/proxy=http://10.17.17.22:8080 \
 "
+
+# OTHERSETUP: add additional virt-install --extra-args here. e.g. setting a default root password.
 OTHERSETUP="passwd/root-password=aiGhi3poodeighu"
+
+# LATESETUP: you should not change this. use LATESCRIPT!
 LATESETUP="preseed/late_command=\"cd /tmp && for f in $LATESCRIPT $PRESEEDFILES; do wget $PRESEEDSERVER/\$f; done; sh $LATESCRIPT $PRESEEDSERVER\""
 
 #
@@ -137,7 +168,11 @@ LATESETUP="preseed/late_command=\"cd /tmp && for f in $LATESCRIPT $PRESEEDFILES;
 # put this in host specific files
 # you may have to overwrite other vars from the global config here too!
 #
+# NAME: this name will be used as hostname and logical volume name of the guest that will be created or wiped
 #NAME=nameofvirtualmachine
+
+# IP: IP Address of guest. This IP will also be used to for salt mode
+# you can use $IP in $HOSTNETWORKSETUP like in "kvmtool template"
 #IP=
 EOL
 }
