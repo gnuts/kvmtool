@@ -1,4 +1,9 @@
-2013-05-05 23:35 +0200  Matthias Nuessle  <matthias.nuessle@mawoh.de>  (5951b13937dd [tip])
+2013-05-05 23:35 +0200  Matthias Nuessle  <matthias.nuessle@mawoh.de>  (6e9457bb13c2 [tip])
+
+	* CHANGELOG:
+	package build 0.1-43
+
+2013-05-05 23:35 +0200  Matthias Nuessle  <matthias.nuessle@mawoh.de>  (5951b13937dd)
 
 	* .hgtags:
 	Added tag 0.1-43 for changeset 69849fafe44a

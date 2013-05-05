@@ -396,7 +396,7 @@ shift
 
 # use default dir if KVMTOOLCONFIGDIR is not set
 if [ -z "$KVMTOOLCONFIGDIR" ]; then
-    KVMTOOLCONFIGDIR="/etc/kvmtool/"
+    KVMTOOLCONFIGDIR="/etc/kvmtool"
 fi
 
 
