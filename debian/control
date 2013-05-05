@@ -1,14 +1,12 @@
-Source: kvmtool-0
+Source: kvmtool
 Section: unknown
 Priority: extra
 Maintainer: Matthias Nuessle <matthias.nuessle@mawoh.de>
 Build-Depends: debhelper (>= 7.0.50~)
 Standards-Version: 3.8.4
 Homepage: <insert the upstream URL, if relevant>
-#Vcs-Git: git://git.debian.org/collab-maint/kvmtool-0.git
-#Vcs-Browser: http://git.debian.org/?p=collab-maint/kvmtool-0.git;a=summary
 
-Package: kvmtool-0
+Package: kvmtool
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: <insert up to 60 chars description>

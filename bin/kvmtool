@@ -65,7 +65,7 @@ cat << 'EOL'
 # global/default options
 #
 LOCATION="http://ftp.debian.org/debian/dists/squeeze/main/installer-amd64/"
-PRESEEDSOURCEDIR="./preseeds"
+PRESEEDSOURCEDIR="preseeds"
 PRESEEDTARGET="/var/www/"
 PRESEEDSERVER="http://10.17.17.22"
 SALTMASTER="10.17.17.22"
@@ -392,8 +392,9 @@ function D {
 mode="$1"
 shift
 
+# use default dir if KVMTOOLCONFIGDIR is not set
 if [ -z "$KVMTOOLCONFIGDIR" ]; then
-    KVMTOOLCONFIGDIR="configs"
+    KVMTOOLCONFIGDIR="/etc/kvmtool/"
 fi
 
 

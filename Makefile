@@ -57,14 +57,9 @@ install: clean update-doc
 	# binaries
 	install -g root -o root -m 755 bin/kvmtool $(INST_SBINDIR)/
 	# configuration
-	cp etc/vpn-ca4.conf.example $(INST_ETCDIR)/vpn-ca4.conf
-	cp etc/openssl.cnf $(INST_ETCDIR)/
-	cp etc/*.example $(INST_ETCDIR)/
-	cp ssl/*.example $(INST_VARLIBDIR)/ssl/
+	cp -a etc/*cfg $(INST_ETCDIR)/preseed
 	chown -vR root:root $(INST_ETCDIR)/
 	chmod -vR u=Xrw,go= $(INST_ETCDIR)/
-	chown -vR root:root $(INST_VARLIBDIR)/
-	chmod -vR u=Xrw,go= $(INST_VARLIBDIR)/
 
 package: debian-package
 debian-package: set-debian-release
