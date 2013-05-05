@@ -70,6 +70,7 @@ package: debian-package
 debian-package: set-debian-release
 	hg commit
 	hg tag "$(VERSION).$(RELEASE)-$(REVISION)"	
+	make changelog
 	hg commit -m "package build $(VERSION).$(RELEASE)-$(REVISION)"
 	make changelog
 	dpkg-buildpackage -ai386 -rfakeroot -us -uc
