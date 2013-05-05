@@ -111,7 +111,8 @@ PRESEEDFILES="authorized_keys"
 
 # LATESCRIPT: script to transfer to remote host and run.
 # will be searched in config dir
-LATESCRIPT="squeeze_latescript.sh"
+# latescript will be called with the preseed server URL as first arg
+LATESCRIPT="latescript_squeeze.sh"
 
 SALTMETHOD="squeeze"
 NETWORK="network=intranet"
@@ -126,7 +127,7 @@ netcfg/confirm_static=true \
 mirror/http/proxy=http://10.17.17.22:8080 \
 "
 OTHERSETUP="passwd/root-password=aiGhi3poodeighu"
-DEFAULTSETUP="preseed/late_command=\"cd /tmp && for f in $LATESCRIPT $PRESEEDFILES; do wget $PRESEEDSERVER/\$f; done; sh $LATESCRIPT\""
+DEFAULTSETUP="preseed/late_command=\"cd /tmp && for f in $LATESCRIPT $PRESEEDFILES; do wget $PRESEEDSERVER/\$f; done; sh $LATESCRIPT $PRESEEDSERVER\""
 
 #
 # host specific configuration
@@ -193,7 +194,7 @@ EOL
 
 
     D "create domain $NAME"
-    echo time virt-install \
+    time virt-install \
         --connect="$KVMHOST" \
         --name="$NAME" \
         --ram="$RAM" \
