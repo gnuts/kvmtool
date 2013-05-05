@@ -58,7 +58,7 @@ function die {
     exit 1
 }
 
-CONFVARS="LOCATION PRESEEDSOURCEDIR PRESEEDTARGET PRESEEDSERVER KVMHOST DNSDOMAIN VCPUS RAM SIZE PVNAME GRAPHICS NETWORK PRESEEDNAME DEFAULTSETUP OTHERSETUP NAME NETWORK HOSTNETWORKSETUP CPU OSTYPE VIRTTYPE ASKBEFORECREATE ASKBEFOREWIPE ASKBEFORESALT SALTMETHOD IP SALTMASTER"
+CONFVARS="LOCATION PRESEEDSOURCEDIR PRESEEDTARGET PRESEEDSERVER KVMHOST DNSDOMAIN VCPUS RAM SIZE PVNAME GRAPHICS NETWORK PRESEEDNAME DEFAULTSETUP OTHERSETUP NAME NETWORK HOSTNETWORKSETUP CPU OSTYPE VIRTTYPE ASKBEFORECREATE ASKBEFOREWIPE ASKBEFORESALT SALTMETHOD IP SALTMASTER LATESCRIPT PRESEEDFILES"
 function output_template {
 cat << 'EOL'
 #
@@ -101,7 +101,18 @@ SIZE=5
 PVNAME="vg0"
 GRAPHICS="vnc"
 NETWORK="network=intranet"
-PRESEEDNAME="simpleserver"
+
+# PRESEEDNAME: preseed file name without .cfg
+PRESEEDNAME="debian_squeeze_default"
+
+# PRESEEDFILES: additional files to copy to the preseedserver
+# will be searched in config dir
+PRESEEDFILES="authorized_keys"
+
+# LATESCRIPT: script to transfer to remote host and run.
+# will be searched in config dir
+LATESCRIPT="squeeze_latescript.sh"
+
 SALTMETHOD="squeeze"
 NETWORK="network=intranet"
 HOSTNETWORKSETUP="\
@@ -114,12 +125,8 @@ netcfg/get_gateway=10.17.17.2 \
 netcfg/confirm_static=true \
 mirror/http/proxy=http://10.17.17.22:8080 \
 "
-OTHERSETUP="\
-passwd/root-password=aiGhi3poodeighu
-"
-DEFAULTSETUP="\
-preseed/late_command=\"mkdir /target/root/.ssh;echo ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCwi2I1fJOCFC9NXE6CV2o0fHpdZwM9+B8IVPlJFBe5wjyhQ6M35qwa21bfmDetshriYHN3MhFKLUajVLEGvEM37oxLEN+/nLepnO3suBd0PW5Y8aEnk9HGTXw0dntJd4OeFUMefRyy/pcfFxbhXwkjnPHI9tuod3LTfzvrV4ribLxtBFFCoDLecCSCjaG0ykaVbj7kl7BkHXFhACmwaKOhekJPuHxWlFm8rU1ESG8QyCYqRYCVRfIvcHH+kqjpkk1QxwRaF1PXzXkM2mhMti/ywBmTEa3syKswA8Hap29QD1AfD1o6Brc4UNgeO4OcHCsgJbv9U0GXhjCOqn56jDHX /home/nuts/.ssh/id_rsa >/target/root/.ssh/authorized_keys\" \
-"
+OTHERSETUP="passwd/root-password=aiGhi3poodeighu"
+DEFAULTSETUP="preseed/late_command=\"cd /tmp && for f in $LATESCRIPT $PRESEEDFILES; do wget $PRESEEDSERVER/\$f; done; sh $LATESCRIPT\""
 
 #
 # host specific configuration
@@ -127,8 +134,7 @@ preseed/late_command=\"mkdir /target/root/.ssh;echo ssh-rsa AAAAB3NzaC1yc2EAAAAD
 # you may have to overwrite other vars from the global config here too!
 #
 #NAME=nameofvirtualmachine
-NAME=
-IP=
+#IP=
 EOL
 }
 
@@ -159,7 +165,7 @@ function create_domain {
         die "there already is a volume called $NAME bailing out"
     fi
 
-    preseedcfg="$PRESEEDSOURCEDIR/$PRESEEDNAME.cfg" 
+    preseedcfg="$KVMTOOLCONFIGDIR/$PRESEEDSOURCEDIR/$PRESEEDNAME.cfg" 
     preseedurl="$PRESEEDSERVER/$PRESEEDNAME.cfg"
 
     D "checking preseed file..."
@@ -180,10 +186,14 @@ EOL
 
     D "copy preseed file to webserver..."
     rsync -a "$preseedcfg" "$PRESEEDTARGET"
+    D "copy additional files to webserver..."
+    for f in $LATESCRIPT $PRESEEDFILES; do
+        rsync -a "$KVMTOOLCONFIGDIR/$f" "$PRESEEDTARGET"
+    done
 
 
     D "create domain $NAME"
-    time virt-install \
+    echo time virt-install \
         --connect="$KVMHOST" \
         --name="$NAME" \
         --ram="$RAM" \
