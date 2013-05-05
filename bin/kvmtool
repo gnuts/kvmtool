@@ -58,7 +58,7 @@ function die {
     exit 1
 }
 
-CONFVARS="LOCATION PRESEEDSOURCEDIR PRESEEDTARGET PRESEEDSERVER KVMHOST DNSDOMAIN VCPUS RAM SIZE PVNAME GRAPHICS NETWORK PRESEEDNAME DEFAULTSETUP OTHERSETUP NAME NETWORK HOSTNETWORKSETUP CPU OSTYPE VIRTTYPE ASKBEFORECREATE ASKBEFOREWIPE ASKBEFORESALT SALTMETHOD IP SALTMASTER LATESCRIPT PRESEEDFILES"
+CONFVARS="LOCATION PRESEEDSOURCEDIR PRESEEDTARGET PRESEEDSERVER KVMHOST DNSDOMAIN VCPUS RAM SIZE PVNAME GRAPHICS NETWORK PRESEEDNAME LATESETUP OTHERSETUP NAME NETWORK HOSTNETWORKSETUP CPU OSTYPE VIRTTYPE ASKBEFORECREATE ASKBEFOREWIPE ASKBEFORESALT SALTMETHOD IP SALTMASTER LATESCRIPT PRESEEDFILES"
 function output_template {
 cat << 'EOL'
 #
@@ -112,6 +112,7 @@ PRESEEDFILES="authorized_keys"
 # LATESCRIPT: script to transfer to remote host and run.
 # will be searched in config dir
 # latescript will be called with the preseed server URL as first arg
+# set to NO if you do not need that
 LATESCRIPT="latescript_squeeze.sh"
 
 SALTMETHOD="squeeze"
@@ -127,7 +128,7 @@ netcfg/confirm_static=true \
 mirror/http/proxy=http://10.17.17.22:8080 \
 "
 OTHERSETUP="passwd/root-password=aiGhi3poodeighu"
-DEFAULTSETUP="preseed/late_command=\"cd /tmp && for f in $LATESCRIPT $PRESEEDFILES; do wget $PRESEEDSERVER/\$f; done; sh $LATESCRIPT $PRESEEDSERVER\""
+LATESETUP="preseed/late_command=\"cd /tmp && for f in $LATESCRIPT $PRESEEDFILES; do wget $PRESEEDSERVER/\$f; done; sh $LATESCRIPT $PRESEEDSERVER\""
 
 #
 # host specific configuration
@@ -187,11 +188,16 @@ EOL
 
     D "copy preseed file to webserver..."
     rsync -a "$preseedcfg" "$PRESEEDTARGET"
-    D "copy additional files to webserver..."
-    for f in $LATESCRIPT $PRESEEDFILES; do
-        rsync -a "$KVMTOOLCONFIGDIR/$f" "$PRESEEDTARGET"
-    done
 
+    if [ "$LATESETUP" == "NO" ]; then
+        LATESETUP=""
+        D "no latesetup configured"
+    else
+        D "copy additional files to webserver..."
+        for f in $LATESCRIPT $PRESEEDFILES; do
+            rsync -a "$KVMTOOLCONFIGDIR/$f" "$PRESEEDTARGET"
+        done
+    fi
 
     D "create domain $NAME"
     time virt-install \
@@ -209,7 +215,7 @@ EOL
         --graphics="$GRAPHICS" \
         --disk="/dev/$PVNAME/$NAME,size=$SIZE" \
         --location="$LOCATION" \
-        --extra-args="auto=true hostname=$NAME domain=$DNSDOMAIN $DEFAULTSETUP $HOSTNETWORKSETUP $OTHERSETUP url=$preseedurl"
+        --extra-args="auto=true hostname=$NAME domain=$DNSDOMAIN $LATESETUP $HOSTNETWORKSETUP $OTHERSETUP url=$preseedurl"
 
 }
 
