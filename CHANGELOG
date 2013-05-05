@@ -1,4 +1,19 @@
-2013-05-05 23:37 +0200  Matthias Nuessle  <matthias.nuessle@mawoh.de>  (40bbac7957fb [tip])
+2013-05-06 01:20 +0200  Matthias Nuessle  <matthias.nuessle@mawoh.de>  (50921a98b0f1 [tip])
+
+	* .hgtags:
+	Added tag 0.1-50 for changeset 99ac5c9e8bc8
+
+2013-05-06 01:20 +0200  Matthias Nuessle  <matthias.nuessle@mawoh.de>  (99ac5c9e8bc8 [0.1-50])
+
+	* debian/changelog:
+	* another experimental build
+
+2013-05-06 00:08 +0200  Matthias Nuessle  <matthias.nuessle@mawoh.de>  (b041afdf751d)
+
+	* CHANGELOG, TODO, bin/kvmtool, debian/files:
+	* added lots of comments to kvmtool template output
+
+2013-05-05 23:37 +0200  Matthias Nuessle  <matthias.nuessle@mawoh.de>  (40bbac7957fb)
 
 	* CHANGELOG:
 	package build 0.1-46
