@@ -1,4 +1,48 @@
-2013-05-05 23:07 +0200  Matthias Nuessle  <matthias.nuessle@mawoh.de>  (833e34b7b610 [tip])
+2013-05-05 23:26 +0200  Matthias Nuessle  <matthias.nuessle@mawoh.de>  (9d5033a84cd5 [tip])
+
+	* .hgtags:
+	Added tag 0.1-37 for changeset efa108067ba3
+
+2013-05-05 23:24 +0200  Matthias Nuessle  <matthias.nuessle@mawoh.de>  (efa108067ba3 [0.1-37])
+
+	* .hgtags:
+	Added tag 0.1-36 for changeset 42b023a5b754
+
+2013-05-05 23:15 +0200  Matthias Nuessle  <matthias.nuessle@mawoh.de>  (42b023a5b754 [0.1-36])
+
+	* TODO: new file.
+	* TODO:
+	* added TODO file. there are always TODOs...
+
+2013-05-05 23:13 +0200  Matthias Nuessle  <matthias.nuessle@mawoh.de>  (5ef452147f91)
+
+	* debian/kvmtool.cron.d.ex, debian/kvmtool.default.ex, debian/kvmtool
+	.doc-base.EX, debian/manpage.1.ex, debian/manpage.sgml.ex,
+	debian/manpage.xml.ex: deleted file.
+	* debian/kvmtool.cron.d.ex, debian/kvmtool.default.ex, debian/kvmtool
+	.doc-base.EX, debian/manpage.1.ex, debian/manpage.sgml.ex,
+	debian/manpage.xml.ex:
+	* still debianizing
+
+2013-05-05 23:11 +0200  Matthias Nuessle  <matthias.nuessle@mawoh.de>  (cf18f477e168)
+
+	* debian/kvmtool.cron.d.ex, debian/kvmtool.default.ex, debian/kvmtool
+	.doc-base.EX: new file.
+	* debian/README.Debian, debian/README.source, debian/emacsen-
+	install.ex, debian/emacsen-remove.ex, debian/emacsen-startup.ex,
+	debian/init.d.ex, debian/kvmtool-0.cron.d.ex,
+	debian/kvmtool-0.default.ex, debian/kvmtool-0.doc-base.EX,
+	debian/menu.ex, debian/watch.ex: deleted file.
+	* CHANGELOG, debian/README.Debian, debian/README.source,
+	debian/changelog, debian/emacsen-install.ex, debian/emacsen-
+	remove.ex, debian/emacsen-startup.ex, debian/files,
+	debian/init.d.ex, debian/kvmtool-0.cron.d.ex,
+	debian/kvmtool-0.default.ex, debian/kvmtool-0.doc-base.EX,
+	debian/kvmtool.cron.d.ex, debian/kvmtool.default.ex, debian/kvmtool
+	.doc-base.EX, debian/menu.ex, debian/watch.ex:
+	* debianzing
+
+2013-05-05 23:07 +0200  Matthias Nuessle  <matthias.nuessle@mawoh.de>  (833e34b7b610)
 
 	* .hgtags:
 	Added tag 0.1-32 for changeset 97904e4107c8

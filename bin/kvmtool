@@ -1,6 +1,6 @@
 #!/bin/bash
 
-
+VERSION=noversion
 #
 # create kvm domain
 # * default config
@@ -27,6 +27,8 @@ if [ -n "$1" ]; then
 fi
 
 cat <<EOL
+
+$0 $VERSION
 
 usage:
 

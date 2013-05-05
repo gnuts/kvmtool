@@ -49,14 +49,17 @@ test:
 update-doc:
 	echo "no docs"
 
-install: clean update-doc
+install: clean update-doc 
 	@echo "installing $(PNAME) $(VERSION).$(RELEASE)-$(REVISION)"
 	mkdir -p $(INST_BINDIR)
 	mkdir -p $(INST_SBINDIR)
 	mkdir -p $(INST_ETCDIR)
 	mkdir -p $(INST_ETCDIR)/preseeds
+	#
 	# binaries
 	install -g root -o root -m 755 bin/kvmtool $(INST_SBINDIR)/
+	perl -p -i -e "s/^VERSION=noversion/VERSION='$(VERSION).$(RELEASE)-$(REVISION)'/" $(INST_SBINDIR)/kvmtool
+	#
 	# configuration
 	cp -a etc/preseeds/debian_squeeze_default.cfg $(INST_ETCDIR)/preseeds
 	cp -a etc/preseeds/squeeze_example_preseed.cfg $(INST_ETCDIR)/preseeds
@@ -65,8 +68,10 @@ install: clean update-doc
 
 package: debian-package
 debian-package: set-debian-release
+	hg commit
 	hg tag "$(VERSION).$(RELEASE)-$(REVISION)"	
 	make changelog
+	hg commit -m "package build $(VERSION).$(RELEASE)-$(REVISION)"
 	dpkg-buildpackage -ai386 -rfakeroot -us -uc
 	dpkg-buildpackage -aamd64 -rfakeroot -us -uc
 	make move-packages
@@ -78,6 +83,7 @@ debian-package: set-debian-release
 set-debian-release:
 	DEBEMAIL="$(USER)" dch -v "$(VERSION).$(RELEASE)-$(REVISION)" "new release"
 
+	
 increase-release:
 	@cat RELEASE|perl -pe '$$_++' >RELEASE.new
 	@mv RELEASE.new RELEASE
