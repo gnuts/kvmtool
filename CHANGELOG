@@ -1,4 +1,14 @@
-2013-05-05 23:35 +0200  Matthias Nuessle  <matthias.nuessle@mawoh.de>  (6e9457bb13c2 [tip])
+2013-05-05 23:37 +0200  Matthias Nuessle  <matthias.nuessle@mawoh.de>  (70f55ebc7e37 [tip])
+
+	* .hgtags:
+	Added tag 0.1-46 for changeset 583789ad7d26
+
+2013-05-05 23:37 +0200  Matthias Nuessle  <matthias.nuessle@mawoh.de>  (583789ad7d26 [0.1-46])
+
+	* CHANGELOG, bin/kvmtool, debian/changelog, debian/files:
+	* removed trainling / from default config path
+
+2013-05-05 23:35 +0200  Matthias Nuessle  <matthias.nuessle@mawoh.de>  (6e9457bb13c2)
 
 	* CHANGELOG:
 	package build 0.1-43
