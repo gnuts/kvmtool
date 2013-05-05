@@ -1,4 +1,24 @@
-2013-05-05 23:30 +0200  Matthias Nuessle  <matthias.nuessle@mawoh.de>  (d8dfd5fb4426 [tip])
+2013-05-05 23:35 +0200  Matthias Nuessle  <matthias.nuessle@mawoh.de>  (5951b13937dd [tip])
+
+	* .hgtags:
+	Added tag 0.1-43 for changeset 69849fafe44a
+
+2013-05-05 23:35 +0200  Matthias Nuessle  <matthias.nuessle@mawoh.de>  (69849fafe44a [0.1-43])
+
+	* Makefile, debian/changelog:
+	* fixing bugs...
+
+2013-05-05 23:34 +0200  Matthias Nuessle  <matthias.nuessle@mawoh.de>  (5ae6f555963f)
+
+	* .hgtags:
+	Added tag 0.1-41 for changeset f382de407035
+
+2013-05-05 23:34 +0200  Matthias Nuessle  <matthias.nuessle@mawoh.de>  (f382de407035 [0.1-41])
+
+	* CHANGELOG, Makefile, debian/changelog, debian/files:
+	* changed package target. now commits before building package
+
+2013-05-05 23:30 +0200  Matthias Nuessle  <matthias.nuessle@mawoh.de>  (d8dfd5fb4426)
 
 	* CHANGELOG:
 	package build 0.1-38
