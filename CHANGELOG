@@ -1,4 +1,14 @@
-2013-05-05 23:26 +0200  Matthias Nuessle  <matthias.nuessle@mawoh.de>  (9d5033a84cd5 [tip])
+2013-05-05 23:30 +0200  Matthias Nuessle  <matthias.nuessle@mawoh.de>  (cfcbee655b6a [tip])
+
+	* .hgtags:
+	Added tag 0.1-38 for changeset ad06838b1c5f
+
+2013-05-05 23:30 +0200  Matthias Nuessle  <matthias.nuessle@mawoh.de>  (ad06838b1c5f [0.1-38])
+
+	* CHANGELOG, Makefile, bin/kvmtool, debian/changelog, debian/files:
+	* tuning Makefile
+
+2013-05-05 23:26 +0200  Matthias Nuessle  <matthias.nuessle@mawoh.de>  (9d5033a84cd5)
 
 	* .hgtags:
 	Added tag 0.1-37 for changeset efa108067ba3
