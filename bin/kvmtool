@@ -108,7 +108,7 @@ HOSTNETWORKSETUP="\
 interface=eth0 \
 netcfg/disable_dhcp=true \
 netcfg/get_nameservers=10.17.17.2 \
-netcfg/get_ipaddress=\$IP \
+netcfg/get_ipaddress=$IP \
 netcfg/get_netmask=255.255.255.0 \
 netcfg/get_gateway=10.17.17.2 \
 netcfg/confirm_static=true \
@@ -220,7 +220,8 @@ function cmd_create {
         die "error: $defaultconf not found"
     fi
 
-    # first load default config then domain config
+    # first load domain config to allow early setup, then default config then domain config again...
+    source "$domainconf"
     source "$defaultconf"
     source "$domainconf"
 
@@ -276,10 +277,28 @@ function cmd_wipe {
     wipe_domain
 }
 
-function salt_squeeze {
+
+function salt_domain {
     set -e
+
+    if [ "$ASKBEFORESALT" != "NO" ]; then
+
+        cat <<EOL
+
+    going to install salt on domain "$NAME" (IP $IP) with master $SALTMASTER
+    salting method: $SALTMETHOD
+    press ENTER to continue or CTRL-C to abort"
+
+EOL
+        read
+    fi 
+
     script=$(mktemp)
-    cat >"$script" << EOL
+    case $SALTMETHOD in
+
+        squeeze)
+
+            cat >"$script" << EOL
 #!/bin/bash
 
 set -e
@@ -288,39 +307,35 @@ echo "deb http://backports.debian.org/debian-backports squeeze-backports main co
 wget -q -O- "http://debian.saltstack.com/debian-salt-team-joehealy.gpg.key" | apt-key add -
 apt-get update
 apt-get -y install salt-minion
-
 perl -p -i -e 's/^\#master: salt/master: $SALTMASTER/' /etc/salt/minion
+/etc/init.d/salt-minion restart
 EOL
-    D "created script $script"
-    ssh="ssh -Cl root $IP"
-    $ssh 'f=$(mktemp) && cat >$f && echo "remote script: $f" && chmod +x $f && $f' < $script
-}
-
-function salt_domain {
-    set -e
-
-    if [ "$ASKBEFORESALT" != "NO" ]; then
-
-    cat <<EOL
-
-    going to install salt on domain "$NAME" (IP $IP) with master $SALTMASTER
-    salting method: $SALTMETHOD
-    press ENTER to continue or CTRL-C to abort"
-
-EOL
-    read
-    fi 
-
-    case $SALTMETHOD in
-        squeeze)
-            salt_squeeze
             ;;
+        ubuntu)
+            cat >"$script" << EOL
+#!/bin/bash
+
+set -e
+apt-get -y install software-properties-common
+add-apt-repository -y ppa:saltstack/salt
+apt-get update
+apt-get -y install salt-minion
+perl -p -i -e 's/^\#master: salt/master: $SALTMASTER/' /etc/salt/minion
+restart salt-minion
+EOL
+        ;;
         *)
             die "unknown salting method"
             ;;
     esac
 
+    set -e
+    D "created script $script"
+    ssh="ssh -Cl root $IP"
+    $ssh 'f=$(mktemp) && cat >$f && echo "remote script: $f" && chmod +x $f && $f && rm -v $f' < $script
+    rm -v "$script"
 }
+
 
 function cmd_salt {
     D "salt mode $*"
