@@ -1,4 +1,15 @@
-2013-05-05 22:59 +0200  Matthias Nuessle  <matthias.nuessle@mawoh.de>  (4c6f3cb6b958 [tip])
+2013-05-05 23:07 +0200  Matthias Nuessle  <matthias.nuessle@mawoh.de>  (833e34b7b610 [tip])
+
+	* .hgtags:
+	Added tag 0.1-32 for changeset 97904e4107c8
+
+2013-05-05 23:07 +0200  Matthias Nuessle  <matthias.nuessle@mawoh.de>  (97904e4107c8 [0.1-32])
+
+	* debian/files: new file.
+	* .hgignore, CHANGELOG, Makefile, debian/changelog, debian/files:
+	* can create debian packages now :)
+
+2013-05-05 22:59 +0200  Matthias Nuessle  <matthias.nuessle@mawoh.de>  (4c6f3cb6b958)
 
 	* .hgtags:
 	Added tag 0.1-30 for changeset 4fe3073b1d61
