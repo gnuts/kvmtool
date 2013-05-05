@@ -58,8 +58,8 @@ install: clean update-doc
 	# binaries
 	install -g root -o root -m 755 bin/kvmtool $(INST_SBINDIR)/
 	# configuration
-	cp -a etc/debian_squeeze_default.cfg $(INST_ETCDIR)/preseeds
-	cp -a etc/squeeze_example_preseed.cfg $(INST_ETCDIR)/preseeds
+	cp -a etc/preseeds/debian_squeeze_default.cfg $(INST_ETCDIR)/preseeds
+	cp -a etc/preseeds/squeeze_example_preseed.cfg $(INST_ETCDIR)/preseeds
 	chown -vR root:root $(INST_ETCDIR)/
 	chmod -vR u=Xrw,go= $(INST_ETCDIR)/
 
@@ -109,31 +109,12 @@ devupdate: reinstall devlinks
 
 move-packages:
 	@mkdir -p ../stable ../unstable
-	@(mv -v ../$(PNAME)_*.*1-*_*.deb ../unstable 2>&1|grep -v 'cannot stat') || true
-	@(mv -v ../$(PNAME)_*.*3-*_*.deb ../unstable 2>&1|grep -v 'cannot stat') || true
-	@(mv -v ../$(PNAME)_*.*5-*_*.deb ../unstable 2>&1|grep -v 'cannot stat') || true
-	@(mv -v ../$(PNAME)_*.*7-*_*.deb ../unstable 2>&1|grep -v 'cannot stat') || true
-	@(mv -v ../$(PNAME)_*.*9-*_*.deb ../unstable 2>&1|grep -v 'cannot stat') || true
-	@(mv ../$(PNAME)_*.*1-*_*.changes ../unstable 2>&1|grep -v 'cannot stat') || true
-	@(mv ../$(PNAME)_*.*3-*_*.changes ../unstable 2>&1|grep -v 'cannot stat') || true
-	@(mv ../$(PNAME)_*.*5-*_*.changes ../unstable 2>&1|grep -v 'cannot stat') || true
-	@(mv ../$(PNAME)_*.*7-*_*.changes ../unstable 2>&1|grep -v 'cannot stat') || true
-	@(mv ../$(PNAME)_*.*9-*_*.changes ../unstable 2>&1|grep -v 'cannot stat') || true
-	@(mv ../$(PNAME)_*.*1-*_*.tar.gz ../unstable 2>&1|grep -v 'cannot stat') || true
-	@(mv ../$(PNAME)_*.*3-*_*.tar.gz ../unstable 2>&1|grep -v 'cannot stat') || true
-	@(mv ../$(PNAME)_*.*5-*_*.tar.gz ../unstable 2>&1|grep -v 'cannot stat') || true
-	@(mv ../$(PNAME)_*.*7-*_*.tar.gz ../unstable 2>&1|grep -v 'cannot stat') || true
-	@(mv ../$(PNAME)_*.*9-*_*.tar.gz ../unstable 2>&1|grep -v 'cannot stat') || true
-	@(mv ../$(PNAME)_*.*1-*_*.dsc ../unstable 2>&1|grep -v 'cannot stat') || true
-	@(mv ../$(PNAME)_*.*3-*_*.dsc ../unstable 2>&1|grep -v 'cannot stat') || true
-	@(mv ../$(PNAME)_*.*5-*_*.dsc ../unstable 2>&1|grep -v 'cannot stat') || true
-	@(mv ../$(PNAME)_*.*7-*_*.dsc ../unstable 2>&1|grep -v 'cannot stat') || true
-	@(mv ../$(PNAME)_*.*9-*_*.dsc ../unstable 2>&1|grep -v 'cannot stat') || true
-	@(mv -v ../$(PNAME)_*.deb ../stable 2>&1|grep -v 'cannot stat') || true
-	@(mv ../$(PNAME)_*.dsc ../stable 2>&1|grep -v 'cannot stat') || true
-	@(mv ../$(PNAME)_*.changes ../stable 2>&1|grep -v 'cannot stat') || true
-	@(mv ../$(PNAME)_*.tar.gz ../stable 2>&1|grep -v 'cannot stat') || true
-
+	@(mv -v ../$(PNAME)_*.*1-*.* ../unstable 2>&1|grep -v 'cannot stat') || true
+	@(mv -v ../$(PNAME)_*.*3-*.* ../unstable 2>&1|grep -v 'cannot stat') || true
+	@(mv -v ../$(PNAME)_*.*5-*.* ../unstable 2>&1|grep -v 'cannot stat') || true
+	@(mv -v ../$(PNAME)_*.*7-*.* ../unstable 2>&1|grep -v 'cannot stat') || true
+	@(mv -v ../$(PNAME)_*.*9-*.* ../unstable 2>&1|grep -v 'cannot stat') || true
+	@(mv -v ../$(PNAME)_*.* ../stable 2>&1|grep -v 'cannot stat') || true
 
 upload: move-packages
 	rsync -vP ../stable/*deb root@$(REPOSITORY):/tmp/ 

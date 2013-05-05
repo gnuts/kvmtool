@@ -1,4 +1,27 @@
-2013-05-05 22:53 +0200  Matthias Nuessle  <matthias.nuessle@mawoh.de>  (a279a2c8fde7 [tip])
+2013-05-05 22:59 +0200  Matthias Nuessle  <matthias.nuessle@mawoh.de>  (4c6f3cb6b958 [tip])
+
+	* .hgtags:
+	Added tag 0.1-30 for changeset 4fe3073b1d61
+
+2013-05-05 22:57 +0200  Matthias Nuessle  <matthias.nuessle@mawoh.de>  (4fe3073b1d61 [0.1-30])
+
+	* .hgtags:
+	Added tag 0.1-29 for changeset 1327bc3b7ead
+
+2013-05-05 22:56 +0200  Matthias Nuessle  <matthias.nuessle@mawoh.de>  (1327bc3b7ead [0.1-29])
+
+	* .hgtags:
+	Added tag 0.1-28 for changeset a674185cfd84
+
+2013-05-05 22:56 +0200  Matthias Nuessle  <matthias.nuessle@mawoh.de>  (a674185cfd84 [0.1-28])
+
+	* CHANGELOG, etc/preseeds/squeeze_example_preseed.cfg: new file.
+	* etc/preseeds/example-preseed.txt: deleted file.
+	* CHANGELOG, Makefile, debian/changelog, debian/docs, etc/preseeds
+	/example-preseed.txt, etc/preseeds/squeeze_example_preseed.cfg:
+	* still debianizing
+
+2013-05-05 22:53 +0200  Matthias Nuessle  <matthias.nuessle@mawoh.de>  (a279a2c8fde7)
 
 	* .hgtags:
 	Added tag 0.1-26 for changeset b34a74605339
