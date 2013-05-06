@@ -1,4 +1,29 @@
-2013-05-06 01:20 +0200  Matthias Nuessle  <matthias.nuessle@mawoh.de>  (50921a98b0f1 [tip])
+2013-05-06 11:19 +0200  Matthias Nuessle  <matthias.nuessle@mawoh.de>  (fe023c21f1cd [tip])
+
+	* .hgtags:
+	Added tag 0.2-55 for changeset aa6405e880e0
+
+2013-05-06 11:19 +0200  Matthias Nuessle  <matthias.nuessle@mawoh.de>  (aa6405e880e0 [0.2-55])
+
+	* debian/changelog:
+	* first stable release
+
+2013-05-06 11:18 +0200  Matthias Nuessle  <matthias.nuessle@mawoh.de>  (d55fc127dc83)
+
+	* .hgtags:
+	Added tag 0.1 for changeset 50e36d42c287
+
+2013-05-06 11:18 +0200  Matthias Nuessle  <matthias.nuessle@mawoh.de>  (50e36d42c287 [0.1])
+
+	* RELEASE, debian/changelog:
+	* i dare to release a first "stable" version :)
+
+2013-05-06 01:20 +0200  Matthias Nuessle  <matthias.nuessle@mawoh.de>  (aa11fd23a0ef)
+
+	* CHANGELOG:
+	package build 0.1-50
+
+2013-05-06 01:20 +0200  Matthias Nuessle  <matthias.nuessle@mawoh.de>  (50921a98b0f1)
 
 	* .hgtags:
 	Added tag 0.1-50 for changeset 99ac5c9e8bc8
@@ -164,7 +189,7 @@
 	debian/control:
 	* debianizing the thing
 
-2013-05-05 22:29 +0200  Matthias Nuessle  <nuts@saukopf.de>  (a230b9853d99)
+2013-05-05 22:29 +0200  "Matthias Nuessle  <nuts@saukopf.de>  (a230b9853d99)
 
 	* Makefile, etc/authorized_keys, etc/broken.conf, etc/default.conf,
 	etc/latescript_squeeze.sh, etc/preseeds/debian_squeeze_default.cfg,
@@ -185,18 +210,18 @@
 	* removing old files
 	* renamed config dir to etc
 
-2013-05-05 11:19 +0200  Matthias Nuessle  <nuts@saukopf.de>  (255cc0b06de1)
+2013-05-05 11:19 +0200  "Matthias Nuessle  <nuts@saukopf.de>  (255cc0b06de1)
 
 	* bin/kvmtool:
 	* latescript can now disabled with LATESCRIPT="NO"
 
-2013-05-05 11:14 +0200  Matthias Nuessle  <nuts@saukopf.de>  (29217cf1d150)
+2013-05-05 11:14 +0200  "Matthias Nuessle  <nuts@saukopf.de>  (29217cf1d150)
 
 	* bin/kvmtool, configs/latescript_squeeze.sh:
 	* fixed bugs
 	* late script functionality now works
 
-2013-05-05 11:00 +0200  Matthias Nuessle  <nuts@saukopf.de>  (25aea6ee3933)
+2013-05-05 11:00 +0200  "Matthias Nuessle  <nuts@saukopf.de>  (25aea6ee3933)
 
 	* preseeds/debian_squeeze_default.cfg, preseeds/example-preseed.txt:
 	deleted file.
@@ -204,24 +229,24 @@
 	preseed.txt:
 	* moving files around
 
-2013-05-05 11:00 +0200  Matthias Nuessle  <nuts@saukopf.de>  (af3521b9be51)
+2013-05-05 11:00 +0200  "Matthias Nuessle  <nuts@saukopf.de>  (af3521b9be51)
 
 	* configs/authorized_keys, configs/latescript_squeeze.sh: new file.
 	* configs/authorized_keys, configs/latescript_squeeze.sh:
 	* adding demo late script
 
-2013-05-05 10:58 +0200  Matthias Nuessle  <nuts@saukopf.de>  (85441735ad54)
+2013-05-05 10:58 +0200  "Matthias Nuessle  <nuts@saukopf.de>  (85441735ad54)
 
 	* bin/kvmtool:
 	* fixing bugs
 	* added late remote script support
 
-2013-05-05 10:56 +0200  Matthias Nuessle  <nuts@saukopf.de>  (cd31eae05ba2)
+2013-05-05 10:56 +0200  "Matthias Nuessle  <nuts@saukopf.de>  (cd31eae05ba2)
 
 	* configs/default.conf, configs/testdomain.conf:
 	* constantly updating configs :)
 
-2013-05-05 10:56 +0200  Matthias Nuessle  <nuts@saukopf.de>  (54d003669289)
+2013-05-05 10:56 +0200  "Matthias Nuessle  <nuts@saukopf.de>  (54d003669289)
 
 	* configs/preseeds/debian_squeeze_default.cfg, configs/preseeds
 	/example-preseed.txt: new file.
@@ -229,47 +254,47 @@
 	/example-preseed.txt:
 	* moved preseeds to config subdir
 
-2013-05-05 10:00 +0200  Matthias Nuessle  <nuts@saukopf.de>  (5a4f5306eec4)
+2013-05-05 10:00 +0200  "Matthias Nuessle  <nuts@saukopf.de>  (5a4f5306eec4)
 
 	* bin/kvmtool:
 	* fixed typos
 	* fixed config loading
 
-2013-05-04 19:42 +0200  Matthias Nuessle  <nuts@saukopf.de>  (aa51c067ba12)
+2013-05-04 19:42 +0200  "Matthias Nuessle  <nuts@saukopf.de>  (aa51c067ba12)
 
 	* .hgignore: new file.
 	* .hgignore:
 	* added hgignore file
 
-2013-05-04 19:39 +0200  Matthias Nuessle  <nuts@saukopf.de>  (27e780a83792)
+2013-05-04 19:39 +0200  "Matthias Nuessle  <nuts@saukopf.de>  (27e780a83792)
 
 	* configs/default.conf, configs/testdomain.conf:
 	* fiddling with config files
 
-2013-05-04 19:38 +0200  Matthias Nuessle  <nuts@saukopf.de>  (9741b746dc66)
+2013-05-04 19:38 +0200  "Matthias Nuessle  <nuts@saukopf.de>  (9741b746dc66)
 
 	* bin/kvmtool:
 	* added salt mode
 	* only supports squeeze at the moment
 
-2013-05-04 18:35 +0200  Matthias Nuessle  <nuts@saukopf.de>  (7a6a9d0c7c59)
+2013-05-04 18:35 +0200  "Matthias Nuessle  <nuts@saukopf.de>  (7a6a9d0c7c59)
 
 	* bin/kvmtool, configs/default.conf:
 	* added wipe mode
 
-2013-05-04 18:17 +0200  Matthias Nuessle  <nuts@saukopf.de>  (b706786f467a)
+2013-05-04 18:17 +0200  "Matthias Nuessle  <nuts@saukopf.de>  (b706786f467a)
 
 	* bin/kvmtool:
 	* fixed missing quotes in late command
 
-2013-05-04 18:16 +0200  Matthias Nuessle  <nuts@saukopf.de>  (b69300c1122a)
+2013-05-04 18:16 +0200  "Matthias Nuessle  <nuts@saukopf.de>  (b69300c1122a)
 
 	* bin/createguest, bin/destroytest: new file.
 	* createguest, destroytest: deleted file.
 	* bin/createguest, bin/destroytest, createguest, destroytest:
 	* moved prototype scripts to bin dir - they will be removed soon
 
-2013-05-04 18:15 +0200  Matthias Nuessle  <nuts@saukopf.de>  (b8010286e239)
+2013-05-04 18:15 +0200  "Matthias Nuessle  <nuts@saukopf.de>  (b8010286e239)
 
 	* .kvmtool.swp, preseeds/simpleserver.cfg: deleted file.
 	* .kvmtool.swp, preseeds/simpleserver.cfg:
@@ -307,7 +332,7 @@
 	* renamed project to kvmtool
 	* moved kvmtool script to bin dir
 
-2013-05-03 01:17 +0200  Matthias Nuessle  <nuts@saukopf.de>  (6caf5eb348c1)
+2013-05-03 01:17 +0200  "Matthias Nuessle  <nuts@saukopf.de>  (6caf5eb348c1)
 
 	* configs/broken.conf, configs/testdomain.conf,
 	preseeds/debian_squeeze_default.cfg: new file.
@@ -317,7 +342,7 @@
 	preseeds/debian_squeeze_default.cfg:
 	* kvmtool create works :)
 
-2013-05-02 23:49 +0200  Matthias Nuessle  <nuts@saukopf.de>  (2e5c0a52de11)
+2013-05-02 23:49 +0200  "Matthias Nuessle  <nuts@saukopf.de>  (2e5c0a52de11)
 
 	* .kvmtool.swp, configs/default.conf, configs/test.conf, kvmtool: new
 	file.
@@ -325,18 +350,18 @@
 	* now implementing kvmtool
 	* added example configurations
 
-2013-05-01 00:42 +0200  Matthias Nuessle  <nuts@saukopf.de>  (b6e2ec688f2e)
+2013-05-01 00:42 +0200  "Matthias Nuessle  <nuts@saukopf.de>  (b6e2ec688f2e)
 
 	* createguest:
 	* removed export command for proxy vars - not needed
 
-2013-05-01 00:36 +0200  Matthias Nuessle  <nuts@saukopf.de>  (d51ef526a062)
+2013-05-01 00:36 +0200  "Matthias Nuessle  <nuts@saukopf.de>  (d51ef526a062)
 
 	* destroytest: new file.
 	* destroytest:
 	* added script to destroy and undefine test domain and test volume
 
-2013-05-01 00:34 +0200  Matthias Nuessle  <nuts@saukopf.de>  (9444087cb62b)
+2013-05-01 00:34 +0200  "Matthias Nuessle  <nuts@saukopf.de>  (9444087cb62b)
 
 	* preseeds/example-preseed.txt, preseeds/simpleserver.cfg: new file.
 	* preseeds/example-preseed.txt, preseeds/simpleserver.cfg:
@@ -346,13 +371,13 @@
 	* preseed experimentally adds a ssh pub key for root
 	* preseed has hardcoded root password which is bad :)
 
-2013-05-01 00:32 +0200  Matthias Nuessle  <nuts@saukopf.de>  (ae108ea15241)
+2013-05-01 00:32 +0200  "Matthias Nuessle  <nuts@saukopf.de>  (ae108ea15241)
 
 	* createguest:
 	* first prototype. does even some sanity checking on domain name and
 	logical volume
 
-2013-04-30 12:59 +0200  Matthias Nuessle  <nuts@saukopf.de>  (12617376e61f)
+2013-04-30 12:59 +0200  "Matthias Nuessle  <nuts@saukopf.de>  (12617376e61f)
 
 	* createguest: new file.
 	* createguest:
