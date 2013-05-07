@@ -3,5 +3,9 @@
 * add support for image files, now only lvm is supported
 * add support for lxc!
 
+---
+
+* maybe reimplement this with perl. bash is so clumsy...
+
 
 
