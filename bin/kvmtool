@@ -219,10 +219,10 @@ function create_domain {
 
     if [ $PVNAME == "NO" ]; then
         # we are using an image file
-        diskmode="PV"
-        disksetup="--disk=\"$DOMAINIMAGEPATH\",size=$SIZE";
-    else
         diskmode="IMG"
+        disksetup="--disk=\"$DOMAINIMAGEPATH/$NAME.img\",size=$SIZE";
+    else
+        diskmode="PV"
         disksetup="--disk=\"/dev/$PVNAME/$NAME\",size=$SIZE"
     fi
 
@@ -302,18 +302,29 @@ function cmd_create {
 function wipe_domain {
     set -e
 
+    if [ $PVNAME == "NO" ]; then
+        diskmode="IMG"
+        # how to delete the image? libvirt?
+        diskdelcmd=""
+        die "deleting image files is not yet supported"
+    else
+        diskmode="PV"
+        diskdelcmd="vol-delete $NAME --pool $PVNAME"
+    fi
+
     if [ "$ASKBEFOREWIPE" != "NO" ]; then
 
-    cat <<EOL
+        cat <<EOL
 
-    going to completely wipe domain "$NAME" (cpus:$VCPUS, ram:${RAM}kb, disk:${SIZE}gb) from PV $PVNAME on host $KVMHOST
+    going to completely wipe domain "$NAME" (cpus:$VCPUS, ram:${RAM}kb, vol:$diskmode, disk:${SIZE}gb) on host $KVMHOST
     press ENTER to continue or CTRL-C to abort"
 
 EOL
-    read
+        read
     fi 
 
-    virsh -c "$KVMHOST" "destroy $NAME;undefine $NAME;vol-delete $NAME --pool $PVNAME"
+    virsh -c "$KVMHOST" "destroy $NAME;undefine $NAME"
+    virsh -c "$KVMHOST" "vol-delete $NAME --pool $PVNAME"
 
 }
 
