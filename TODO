@@ -1,2 +1,7 @@
-* add dependencies to control file
+* add dependencies to debian control file
+* support wheezy soon!
+* add support for image files, now only lvm is supported
+* add support for lxc!
+
+
 
