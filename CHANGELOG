@@ -1,4 +1,9 @@
-2013-05-06 11:19 +0200  Matthias Nuessle  <matthias.nuessle@mawoh.de>  (fe023c21f1cd [tip])
+2013-05-06 11:19 +0200  Matthias Nuessle  <matthias.nuessle@mawoh.de>  (ebef1967d108 [tip])
+
+	* CHANGELOG:
+	package build 0.2-55
+
+2013-05-06 11:19 +0200  Matthias Nuessle  <matthias.nuessle@mawoh.de>  (fe023c21f1cd)
 
 	* .hgtags:
 	Added tag 0.2-55 for changeset aa6405e880e0
