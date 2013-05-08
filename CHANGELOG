@@ -1,4 +1,19 @@
-2013-05-09 00:32 +0200  Matthias Nuessle  <matthias.nuessle@mawoh.de>  (8a63d62ab686 [tip])
+2013-05-09 01:08 +0200  Matthias Nuessle  <matthias.nuessle@mawoh.de>  (cae1e93a63ae [tip])
+
+	* .hgtags:
+	Added tag 0.2-70 for changeset 86eb129ad271
+
+2013-05-09 01:08 +0200  Matthias Nuessle  <matthias.nuessle@mawoh.de>  (86eb129ad271 [0.2-70])
+
+	* debian/changelog:
+	* bugfix release
+
+2013-05-09 01:08 +0200  Matthias Nuessle  <matthias.nuessle@mawoh.de>  (5513f8e191d1)
+
+	* CHANGELOG, bin/kvmtool, debian/files:
+	* fixed bug: reversed logic when checking PVNAME==NO
+
+2013-05-09 00:32 +0200  Matthias Nuessle  <matthias.nuessle@mawoh.de>  (8a63d62ab686)
 
 	* CHANGELOG:
 	package build 0.2-66
