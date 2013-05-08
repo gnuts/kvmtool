@@ -139,7 +139,7 @@ LATESCRIPT="latescript_squeeze.sh"
 
 
 # SALTMETHOD: Method to use when installing salt on a target.
-# possible values: "squeeze", "ubuntu" (still untested)
+# possible values: "squeeze","wheezy", "ubuntu" (still untested)
 SALTMETHOD="squeeze"
 
 # NETWORK: guest network hardware setup. read manual page of virt-install for details
@@ -375,6 +375,20 @@ EOL
     script=$(mktemp)
     case $SALTMETHOD in
 
+        wheezy)
+
+            cat >"$script" << EOL
+#!/bin/bash
+
+set -e
+echo "deb http://debian.saltstack.com/debian wheezy-saltstack main" >/etc/apt/sources.list.d/salt.list 
+wget -q -O- "http://debian.saltstack.com/debian-salt-team-joehealy.gpg.key" | apt-key add -
+apt-get update
+apt-get -y install salt-minion
+perl -p -i -e 's/^\#master: salt/master: $SALTMASTER/' /etc/salt/minion
+/etc/init.d/salt-minion restart
+EOL
+            ;;
         squeeze)
 
             cat >"$script" << EOL
