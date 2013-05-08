@@ -1,5 +1,6 @@
 #!/bin/bash
 
+#set -x
 VERSION=noversion
 #
 # create kvm domain
@@ -12,11 +13,6 @@ VERSION=noversion
 # * destroy and undefine lv
 #
 # install salt on various OS Distributions
-#
-#
-# example use:
-# kvmtool create mydomain from mydefaultconfig
-# kvmtool wipe mydomain like mydefaultconfig
 #
 
 
@@ -61,7 +57,7 @@ function die {
 }
 
 # all vars in CONFVARS must be set when creating or wiping, or sanitycheck() will bail out
-CONFVARS="LOCATION PRESEEDSOURCEDIR PRESEEDTARGET PRESEEDSERVER KVMHOST DNSDOMAIN VCPUS RAM SIZE PVNAME GRAPHICS NETWORK PRESEEDNAME LATESETUP OTHERSETUP NAME NETWORK HOSTNETWORKSETUP CPU OSTYPE VIRTTYPE ASKBEFORECREATE ASKBEFOREWIPE ASKBEFORESALT SALTMETHOD IP SALTMASTER LATESCRIPT PRESEEDFILES"
+CONFVARS="LOCATION PRESEEDSOURCEDIR PRESEEDTARGET PRESEEDSERVER KVMHOST DNSDOMAIN VCPUS RAM SIZE PVNAME GRAPHICS NETWORK PRESEEDNAME LATESETUP OTHERSETUP NAME NETWORK HOSTNETWORKSETUP CPU OSTYPE VIRTTYPE ASKBEFORECREATE ASKBEFOREWIPE ASKBEFORESALT SALTMETHOD IP SALTMASTER LATESCRIPT PRESEEDFILES DOMAINIMAGEPATH"
 function output_template {
 cat << 'EOL'
 #
@@ -121,7 +117,12 @@ RAM=1024
 SIZE=5
 
 # PVNAME: Name of physical volume to create guest logical volumes on.
+# set to "NO" if you want to use image files
 PVNAME="vg0"
+
+# DOMAINIMAGEPATH: path where to put domain image files when not using lvm
+# will be used if PVNAME is "NO"
+DOMAINIMAGEPATH="/some/path"
 
 # PRESEEDNAME: preseed file name. without .cfg extension and path!
 PRESEEDNAME="debian_squeeze_default"
@@ -200,8 +201,12 @@ function create_domain {
     fi
 
     # check whether a $name volume already exists
-    if virsh -c "$KVMHOST" vol-path --pool "$PVNAME" "$NAME" >/dev/null 2>&1; then
-        die "there already is a volume called $NAME bailing out"
+    if [ $PVNAME == "NO" ]; then
+        if virsh -c "$KVMHOST" vol-path --pool "$PVNAME" "$NAME" >/dev/null 2>&1; then
+            die "there already is a volume called $NAME bailing out"
+        fi
+    else
+        die "error: domain image file sanity check not yet implemented"
     fi
 
     preseedcfg="$KVMTOOLCONFIGDIR/$PRESEEDSOURCEDIR/$PRESEEDNAME.cfg" 
@@ -212,11 +217,20 @@ function create_domain {
         die "could not find preseed file $preseedcfg"
     fi
 
+    if [ $PVNAME == "NO" ]; then
+        # we are using an image file
+        diskmode="IMG"
+        disksetup="--disk=\"$DOMAINIMAGEPATH/$NAME.img\",size=$SIZE";
+    else
+        diskmode="PV"
+        disksetup="--disk=\"/dev/$PVNAME/$NAME\",size=$SIZE"
+    fi
+
     if [ "$ASKBEFORECREATE" != "NO" ]; then
 
     cat <<EOL
 
-    going to create domain "$NAME" (cpus:$VCPUS, ram:${RAM}kb, disk:${SIZE}gb) on PV $PVNAME on host $KVMHOST
+    going to create domain "$NAME" (cpus:$VCPUS, ram:${RAM}kb, vol:$diskmode, disk:${SIZE}gb) on host $KVMHOST
     press ENTER to continue or CTRL-C to abort"
 
 EOL
@@ -250,7 +264,7 @@ EOL
         --hvm \
         --network="$NETWORK" \
         --graphics="$GRAPHICS" \
-        --disk="/dev/$PVNAME/$NAME,size=$SIZE" \
+        $disksetup \
         --location="$LOCATION" \
         --extra-args="auto=true hostname=$NAME domain=$DNSDOMAIN $LATESETUP $HOSTNETWORKSETUP $OTHERSETUP url=$preseedurl"
 
@@ -288,18 +302,29 @@ function cmd_create {
 function wipe_domain {
     set -e
 
+    if [ $PVNAME == "NO" ]; then
+        diskmode="IMG"
+        # how to delete the image? libvirt?
+        diskdelcmd=""
+        die "deleting image files is not yet supported"
+    else
+        diskmode="PV"
+        diskdelcmd="vol-delete $NAME --pool $PVNAME"
+    fi
+
     if [ "$ASKBEFOREWIPE" != "NO" ]; then
 
-    cat <<EOL
+        cat <<EOL
 
-    going to completely wipe domain "$NAME" (cpus:$VCPUS, ram:${RAM}kb, disk:${SIZE}gb) from PV $PVNAME on host $KVMHOST
+    going to completely wipe domain "$NAME" (cpus:$VCPUS, ram:${RAM}kb, vol:$diskmode, disk:${SIZE}gb) on host $KVMHOST
     press ENTER to continue or CTRL-C to abort"
 
 EOL
-    read
+        read
     fi 
 
-    virsh -c "$KVMHOST" "destroy $NAME;undefine $NAME;vol-delete $NAME --pool $PVNAME"
+    virsh -c "$KVMHOST" "destroy $NAME;undefine $NAME"
+    virsh -c "$KVMHOST" "vol-delete $NAME --pool $PVNAME"
 
 }
 
