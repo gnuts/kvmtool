@@ -1,4 +1,54 @@
-2013-05-06 11:19 +0200  Matthias Nuessle  <matthias.nuessle@mawoh.de>  (ebef1967d108 [tip])
+2013-05-09 00:32 +0200  Matthias Nuessle  <matthias.nuessle@mawoh.de>  (ee1e7d128db3 [tip])
+
+	* .hgtags:
+	Added tag 0.2-66 for changeset c72c1a2367ca
+
+2013-05-09 00:32 +0200  Matthias Nuessle  <matthias.nuessle@mawoh.de>  (c72c1a2367ca [0.2-66])
+
+	* debian/changelog:
+	* new package with wheezy support
+
+2013-05-09 00:31 +0200  Matthias Nuessle  <matthias.nuessle@mawoh.de>  (47a2fcec4158)
+
+	* TODO:
+	* todos...
+
+2013-05-09 00:30 +0200  Matthias Nuessle  <matthias.nuessle@mawoh.de>  (701deb47be44)
+
+	* bin/kvmtool:
+	* added salt support for wheezy
+
+2013-05-08 10:04 +0200  Matthias Nuessle  <matthias.nuessle@mawoh.de>  (1de9b64fd303)
+
+	* CHANGELOG, debian/files:
+	* merged heads
+
+2013-05-08 10:03 +0200  Matthias Nuessle  <matthias.nuessle@mawoh.de>  (8f0412761c69)
+
+	* CHANGELOG, debian/files:
+	* nix
+
+2013-05-07 22:03 +0200  Matthias Nuessle  <matthias.nuessle@mawoh.de>  (0e85cf2e5e86)
+
+	* TODO:
+	* todos...
+
+2013-05-07 22:02 +0200  Matthias Nuessle  <matthias.nuessle@mawoh.de>  (a018f64cfa56)
+
+	* TODO:
+	* some more todos. lxc should be supported soon!
+
+2013-05-07 22:02 +0200  Matthias Nuessle  <matthias.nuessle@mawoh.de>  (364a5e0e87ca)
+
+	* bin/kvmtool:
+	* still adding support for img files
+
+2013-05-07 15:51 +0200  Matthias Nuessle  <matthias.nuessle@mawoh.de>  (e0fb7c5da077)
+
+	* CHANGELOG, bin/kvmtool, debian/files:
+	* adding image mode for disk setup
+
+2013-05-06 11:19 +0200  Matthias Nuessle  <matthias.nuessle@mawoh.de>  (ebef1967d108)
 
 	* CHANGELOG:
 	package build 0.2-55
