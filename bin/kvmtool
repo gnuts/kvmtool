@@ -202,11 +202,11 @@ function create_domain {
 
     # check whether a $name volume already exists
     if [ $PVNAME == "NO" ]; then
+        die "error: domain image file sanity check not yet implemented"
+    else
         if virsh -c "$KVMHOST" vol-path --pool "$PVNAME" "$NAME" >/dev/null 2>&1; then
             die "there already is a volume called $NAME bailing out"
         fi
-    else
-        die "error: domain image file sanity check not yet implemented"
     fi
 
     preseedcfg="$KVMTOOLCONFIGDIR/$PRESEEDSOURCEDIR/$PRESEEDNAME.cfg" 
