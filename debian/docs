@@ -2,4 +2,4 @@ CHANGELOG
 VERSION
 RELEASE
 etc/*.conf
-etc/preseeds/*cfg
+etc/preseeds/*example*cfg
