@@ -1,4 +1,9 @@
-2013-05-09 15:28 +0200  Matthias Nuessle  <matthias.nuessle@mawoh.de>  (3af94789848b [tip])
+2013-05-09 15:28 +0200  Matthias Nuessle  <matthias.nuessle@mawoh.de>  (0ef72df20b8b [tip])
+
+	* CHANGELOG:
+	package build 0.4-84
+
+2013-05-09 15:28 +0200  Matthias Nuessle  <matthias.nuessle@mawoh.de>  (3af94789848b)
 
 	* .hgtags:
 	Added tag 0.4-84 for changeset 4fe945db99f6
