@@ -75,10 +75,10 @@ PRESEEDSOURCEDIR="preseeds"
 PRESEEDTARGET="/var/www/"
 
 # PRESEEDSERVER: URL of webserver path, where preseed and latefiles can be found
-PRESEEDSERVER="http://10.17.17.22"
+PRESEEDSERVER="http://10.1.1.22"
 
 # SALTMASTER: IP/FQDN of saltmaster the minion shall use
-SALTMASTER="10.17.17.22"
+SALTMASTER="10.1.1.22"
 
 # set to exactly "NO", to suppress manual interaction
 # be very careful. you can fsck up your virtual machines without warning then
@@ -88,9 +88,9 @@ ASKBEFORESALT=yes
 
 # proxies to use when loading $LOCATION
 # this is not the proxy that will be used during installation in the guest!
-http_proxy="http://10.17.17.22:8080"
-https_proxy="http://10.17.17.22:8080"
-ftp_proxy="http://10.17.17.22:8080"
+export http_proxy="http://10.1.1.22:8080"
+export https_proxy="http://10.1.1.22:8080"
+export ftp_proxy="http://10.1.1.22:8080"
 
 
 #
@@ -98,7 +98,7 @@ ftp_proxy="http://10.17.17.22:8080"
 #
 
 # hostname or alias of the KVM host system
-KVMHOST="ziolkowski"
+KVMHOST="yourkvmhost"
 
 # basic kvm parameters, read virt-install manpage for possible values
 CPU="host"
@@ -109,7 +109,7 @@ GRAPHICS="vnc"
 #
 # default kvm domain settings
 #
-DNSDOMAIN="int.druidenkacke.de"
+DNSDOMAIN="example.com"
 VCPUS=1
 RAM=1024
 
@@ -139,27 +139,28 @@ LATESCRIPT="latescript_squeeze.sh"
 
 
 # SALTMETHOD: Method to use when installing salt on a target.
-# possible values: "squeeze","wheezy", "ubuntu" (still untested)
+# possible values: "squeeze","wheezy", "ubuntu" (tested with 13.04)
 SALTMETHOD="squeeze"
 
 # NETWORK: guest network hardware setup. read manual page of virt-install for details
-NETWORK="network=intranet"
+NETWORK="network=default"
 
 # HOSTNETWORKSETUP: network configuration for the guest. this is preseed syntax
 # also set guest system proxy here
 HOSTNETWORKSETUP="\
 interface=eth0 \
 netcfg/disable_dhcp=true \
-netcfg/get_nameservers=10.17.17.2 \
+netcfg/disable_autoconfig=true \
+netcfg/get_nameservers=10.1.1.2 \
 netcfg/get_ipaddress=$IP \
 netcfg/get_netmask=255.255.255.0 \
-netcfg/get_gateway=10.17.17.2 \
+netcfg/get_gateway=10.1.1.2 \
 netcfg/confirm_static=true \
-mirror/http/proxy=http://10.17.17.22:8080 \
+mirror/http/proxy=http://10.1.1.22:8080 \
 "
 
 # OTHERSETUP: add additional virt-install --extra-args here. e.g. setting a default root password.
-OTHERSETUP="passwd/root-password=aiGhi3poodeighu"
+OTHERSETUP="passwd/root-password=yourFunny24324-Password"
 
 # LATESETUP: you should not change this. use LATESCRIPT!
 LATESETUP="preseed/late_command=\"cd /tmp && for f in $LATESCRIPT $PRESEEDFILES; do wget $PRESEEDSERVER/\$f; done; sh $LATESCRIPT $PRESEEDSERVER\""
