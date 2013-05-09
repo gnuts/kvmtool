@@ -57,7 +57,7 @@ function die {
 }
 
 # all vars in CONFVARS must be set when creating or wiping, or sanitycheck() will bail out
-CONFVARS="LOCATION PRESEEDSOURCEDIR PRESEEDTARGET PRESEEDSERVER KVMHOST DNSDOMAIN VCPUS RAM SIZE PVNAME GRAPHICS NETWORK PRESEEDNAME LATESETUP OTHERSETUP NAME NETWORK HOSTNETWORKSETUP CPU OSTYPE VIRTTYPE ASKBEFORECREATE ASKBEFOREWIPE ASKBEFORESALT SALTMETHOD IP SALTMASTER LATESCRIPT PRESEEDFILES DOMAINIMAGEPATH AUTOSTARTDOMAIN"
+CONFVARS="LOCATION PRESEEDSOURCEDIR PRESEEDTARGET PRESEEDSERVER KVMHOST DNSDOMAIN VCPUS RAM SIZE PVNAME GRAPHICS NETWORK PRESEEDNAME LATESETUP OTHERSETUP NAME NETWORK HOSTNETWORKSETUP CPU OSTYPE VIRTTYPE ASKBEFORECREATE ASKBEFOREWIPE ASKBEFORESALT SALTMETHOD IP SALTMASTER LATESCRIPT PRESEEDFILES DOMAINIMAGEPATH AUTOSTARTDOMAIN AUTOSALTDOMAIN"
 function output_template {
 cat << 'EOL'
 #
@@ -72,6 +72,7 @@ PRESEEDSOURCEDIR="preseeds"
 
 # PRESEEDTARGET: the selected preseed file, the latescript and all additional files will be copied there
 # this is done using rsync and can be a remote target. e.g. webuser@someserv.er:/srv/www/
+# make sure that you set permissions correctly beforehand, because rsync -a is used to transfer
 PRESEEDTARGET="/var/www/"
 
 # PRESEEDSERVER: URL of webserver path, where preseed and latefiles can be found
@@ -118,6 +119,14 @@ SIZE=5
 
 # AUTOSTARTDOMAIN: set to exactly "YES" to automatically start domain on boot
 AUTOSTARTDOMAIN="no"
+
+# AUTOSALTDOMAIN: automatically call salt mode after creating domain.
+# set to exactly "YES" if you want that.
+# this will wait until $IP answers to ping then delay a bit and then call salt mode
+AUTOSALTDOMAIN="no"
+
+# AUTOSALTDELAY: wait some time after fresh domain answers to ping"
+AUTOSALTDELAY="15"
 
 # PVNAME: Name of physical volume to create guest logical volumes on.
 # set to "NO" if you want to use image files
@@ -275,6 +284,7 @@ EOL
     if [ "$AUTOSTARTDOMAIN" == "YES" ]; then
         virsh --connect="$KVMHOST" "autostart $NAME"
     fi
+
 }
 
 function cmd_create {
@@ -304,6 +314,22 @@ function cmd_create {
     # make sure all vars are available...
     sanitycheck
     create_domain
+
+    if [ "$AUTOSALTDOMAIN" != "YES" ]; then
+        return 0
+    fi
+
+    # wait until it pings...
+    echo -n "going to salt, waiting for host"
+    until ping -c1 -q $IP >/dev/null; do
+        echo -n "."
+        sleep 1
+    done
+    echo
+    echo "host found. waiting for $AUTOSALTDELAY seconds..."
+    sleep "$AUTOSALTDELAY"
+    ASKBEFORESALT=NO    
+    salt_domain
 }
 
 function wipe_domain {
@@ -386,7 +412,6 @@ EOL
 
             cat >"$script" << EOL
 #!/bin/bash
-
 set -e
 echo "deb http://debian.saltstack.com/debian wheezy-saltstack main" >/etc/apt/sources.list.d/salt.list 
 wget -q -O- "http://debian.saltstack.com/debian-salt-team-joehealy.gpg.key" | apt-key add -
@@ -400,7 +425,6 @@ EOL
 
             cat >"$script" << EOL
 #!/bin/bash
-
 set -e
 echo "deb http://debian.saltstack.com/debian squeeze-saltstack main" >/etc/apt/sources.list.d/salt.list 
 echo "deb http://backports.debian.org/debian-backports squeeze-backports main contrib non-free" >>/etc/apt/sources.list.d/salt.list
@@ -414,7 +438,6 @@ EOL
         ubuntu)
             cat >"$script" << EOL
 #!/bin/bash
-
 set -e
 apt-get -y install software-properties-common
 add-apt-repository -y ppa:saltstack/salt
@@ -431,7 +454,7 @@ EOL
 
     set -e
     D "created script $script"
-    ssh="ssh -Cl root $IP"
+    ssh="ssh -Cl root -o stricthostkeychecking=no $IP"
     $ssh 'f=$(mktemp) && cat >$f && echo "remote script: $f" && chmod +x $f && $f && rm -v $f' < $script
     rm -v "$script"
 }
