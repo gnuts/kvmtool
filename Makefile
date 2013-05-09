@@ -61,8 +61,10 @@ install: clean update-doc
 	perl -p -i -e "s/^VERSION=noversion/VERSION='$(VERSION).$(RELEASE)-$(REVISION)'/" $(INST_SBINDIR)/kvmtool
 	#
 	# configuration
-	cp -a etc/preseeds/debian_squeeze_default.cfg $(INST_ETCDIR)/preseeds
-	cp -a etc/preseeds/squeeze_example_preseed.cfg $(INST_ETCDIR)/preseeds
+	#cp -a etc/preseeds/*.cfg $(INST_ETCDIR)/preseeds
+	#cp -a etc/*.conf $(INST_ETCDIR)/preseeds
+	cp -a etc/*.sh $(INST_ETCDIR)/
+	cp -a etc/authorized_keys $(INST_ETCDIR)/
 	chown -vR root:root $(INST_ETCDIR)/
 	chmod -vR u=Xrw,go= $(INST_ETCDIR)/
 

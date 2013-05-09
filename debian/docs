@@ -1,4 +1,5 @@
 CHANGELOG
 VERSION
 RELEASE
-
+etc/*.conf
+etc/preseeds/*cfg
