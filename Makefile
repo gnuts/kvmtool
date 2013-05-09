@@ -108,7 +108,7 @@ new-release:
 	make increase-release set-debian-release update-version-files
 	hg commit -m "final commit before release change"
 	hg tag "$(VERSION).$(RELEASE)"	
-	hg commit -m "new releasei $(VERSION).$(RELEASE)"
+	#hg commit -m "new releasei $(VERSION).$(RELEASE)"
 	hg push
 
 devlinks:
