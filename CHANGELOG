@@ -1,4 +1,61 @@
-2013-05-09 01:08 +0200  Matthias Nuessle  <matthias.nuessle@mawoh.de>  (38c9e18413ed [tip])
+2013-05-09 15:17 +0200  Matthias Nuessle  <matthias.nuessle@mawoh.de>  (d8d1a827ce07 [tip])
+
+	* .hgtags:
+	Added tag 0.4-79 for changeset a23424550733
+
+2013-05-09 15:17 +0200  Matthias Nuessle  <matthias.nuessle@mawoh.de>  (a23424550733 [0.4-79])
+
+	* debian/changelog:
+	* building new package - much more examples
+
+2013-05-09 15:17 +0200  Matthias Nuessle  <matthias.nuessle@mawoh.de>  (06f23299a5f9)
+
+	* .hgtags:
+	Added tag 0.3 for changeset 136ee05b7a14
+
+2013-05-09 15:17 +0200  Matthias Nuessle  <matthias.nuessle@mawoh.de>  (136ee05b7a14 [0.3])
+
+	* RELEASE, debian/changelog:
+	* new release
+
+2013-05-09 15:16 +0200  Matthias Nuessle  <matthias.nuessle@mawoh.de>  (299f26380006)
+
+	* .hgtags:
+	Added tag 0.2 for changeset cb4ff4f58879
+
+2013-05-09 15:16 +0200  Matthias Nuessle  <matthias.nuessle@mawoh.de>  (cb4ff4f58879 [0.2])
+
+	* RELEASE, debian/changelog:
+	* increased release
+
+2013-05-09 15:16 +0200  Matthias Nuessle  <matthias.nuessle@mawoh.de>  (fb4bcce94fb4)
+
+	* Makefile, debian/docs:
+	* example configs will now be put in doc dir
+
+2013-05-09 15:13 +0200  Matthias Nuessle  <matthias.nuessle@mawoh.de>  (803c72fb2e84)
+
+	* etc/default_raring.conf, etc/default_squeeze.conf,
+	etc/default_wheezy.conf, etc/latescript_ubuntu.sh,
+	etc/latescript_wheezy.sh, etc/preseeds/debian_wheezy_default.cfg,
+	etc/preseeds/raring_example_preseed.cfg,
+	etc/preseeds/ubuntu_raring_default.cfg,
+	etc/preseeds/wheezy_example_preseed.cfg: new file.
+	* etc/default.conf: deleted file.
+	* CHANGELOG, bin/kvmtool, debian/files, etc/authorized_keys,
+	etc/broken.conf, etc/default.conf, etc/default_raring.conf,
+	etc/default_squeeze.conf, etc/default_wheezy.conf,
+	etc/latescript_ubuntu.sh, etc/latescript_wheezy.sh,
+	etc/preseeds/debian_squeeze_default.cfg,
+	etc/preseeds/debian_wheezy_default.cfg,
+	etc/preseeds/raring_example_preseed.cfg,
+	etc/preseeds/ubuntu_raring_default.cfg,
+	etc/preseeds/wheezy_example_preseed.cfg, etc/testdomain.conf:
+	* added lots of examples
+	* fixed template
+	* changed passwords and IPs in examples
+
+2013-05-09 01:08 +0200  Matthias Nuessle  <matthias.nuessle@mawoh.de>  (38c9e18413ed)
 
 	* CHANGELOG:
 	package build 0.2-70
