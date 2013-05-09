@@ -1,4 +1,27 @@
-2013-05-09 15:17 +0200  Matthias Nuessle  <matthias.nuessle@mawoh.de>  (daed7441704d [tip])
+2013-05-09 15:28 +0200  Matthias Nuessle  <matthias.nuessle@mawoh.de>  (3af94789848b [tip])
+
+	* .hgtags:
+	Added tag 0.4-84 for changeset 4fe945db99f6
+
+2013-05-09 15:28 +0200  Matthias Nuessle  <matthias.nuessle@mawoh.de>  (4fe945db99f6 [0.4-84])
+
+	* debian/changelog:
+	* its growing!
+
+2013-05-09 15:27 +0200  Matthias Nuessle  <matthias.nuessle@mawoh.de>  (a915492558d7)
+
+	* etc/broken.conf: deleted file.
+	* CHANGELOG, Makefile, debian/docs, debian/files, etc/broken.conf,
+	etc/default_raring.conf, etc/default_squeeze.conf,
+	etc/default_wheezy.conf:
+	* now installing working preseed examples to /etc/
+
+2013-05-09 15:27 +0200  Matthias Nuessle  <matthias.nuessle@mawoh.de>  (77d151e9e856)
+
+	* bin/kvmtool:
+	* added AUTOSTARTDOMAIN option
+
+2013-05-09 15:17 +0200  Matthias Nuessle  <matthias.nuessle@mawoh.de>  (daed7441704d)
 
 	* CHANGELOG:
 	package build 0.4-79
