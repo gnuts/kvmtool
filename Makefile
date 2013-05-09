@@ -106,8 +106,9 @@ new-release:
 	@echo "press ENTER to continue or C-c to abort"
 	@read
 	make increase-release set-debian-release update-version-files
-	hg commit
+	hg commit -m "final commit before release change"
 	hg tag "$(VERSION).$(RELEASE)"	
+	hg commit -m "new releasei $(VERSION).$(RELEASE)"
 	hg push
 
 devlinks:
