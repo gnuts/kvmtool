@@ -69,10 +69,10 @@ install: clean update-doc
 
 package: debian-package
 debian-package: set-debian-release
-	git commit
+	git commit -asm "package build $(VERSION).$(RELEASE)-$(REVISION)"
 	git tag -a "$(VERSION).$(RELEASE)-$(REVISION)"	
 	make changelog
-	git commit -m "package build $(VERSION).$(RELEASE)-$(REVISION)"
+	git commit -asm "package build $(VERSION).$(RELEASE)-$(REVISION)"
 	make changelog
 	dpkg-buildpackage -ai386 -rfakeroot -us -uc
 	dpkg-buildpackage -aamd64 -rfakeroot -us -uc
