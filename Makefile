@@ -12,8 +12,8 @@ DESTDIR ?= /
 USRPREFIX  ?= /usr
 VERSION  = $(shell head -n 1 VERSION)
 RELEASE  = $(shell head -n 1 RELEASE)
-REVISION = $(shell hg parents|grep changeset:|tr -d " "|cut -d: -f2)
-USER     = $(shell hg parents|grep "user:"|perl -pe 's/user:\s*//')
+REVISION = $(shell git log HEAD^..HEAD --oneline | cut -d ' ' -f1)
+USER     = $(shell git log HEAD^..HEAD | grep Author | cut -d: -f2)
 
 BINDIR  = $(USRPREFIX)/bin
 SBINDIR = $(USRPREFIX)/sbin
@@ -69,10 +69,10 @@ install: clean update-doc
 
 package: debian-package
 debian-package: set-debian-release
-	hg commit
-	hg tag "$(VERSION).$(RELEASE)-$(REVISION)"	
+	git commit
+	git tag -a "$(VERSION).$(RELEASE)-$(REVISION)"	
 	make changelog
-	hg commit -m "package build $(VERSION).$(RELEASE)-$(REVISION)"
+	git commit -m "package build $(VERSION).$(RELEASE)-$(REVISION)"
 	make changelog
 	dpkg-buildpackage -ai386 -rfakeroot -us -uc
 	dpkg-buildpackage -aamd64 -rfakeroot -us -uc
@@ -106,10 +106,9 @@ new-release:
 	@echo "press ENTER to continue or C-c to abort"
 	@read
 	make increase-release set-debian-release update-version-files
-	hg commit -m "final commit before release change"
-	hg tag "$(VERSION).$(RELEASE)"	
-	#hg commit -m "new releasei $(VERSION).$(RELEASE)"
-	hg push
+	git commit -m "final commit before release change"
+	git tag -a "$(VERSION).$(RELEASE)"	
+	git push
 
 devlinks:
 	ln -svf $$(pwd)/bin/vpn-ca4 $(SBINDIR)/
@@ -131,4 +130,4 @@ upload: move-packages
 
 
 changelog:
-	 hg history --style changelog >CHANGELOG
+	git log --data-order --date=short sed -e '/^commit.*$/d' | awk '/^Author/ {sub(/\\$/,""); getline t; print $0 t; next}; 1' | sed -e 's/^Author: //g' | sed -e 's/>Date:   \([0-9]*-[0-9]*-[0-9]*\)/>\t\1/g' | sed -e 's/^\(.*\) \(\)\t\(.*\)/\3    \1    \2/g' > CHANGELOG
