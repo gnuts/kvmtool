@@ -79,7 +79,8 @@ install: clean update-doc
 
 package: debian-package
 debian-package:
-	debuild -uc -us
+	debuild --no-tgz-check -uc -us
+
 
 set-debian-release:
 	dch -v "$(VERSION).$(RELEASE)-$(REVISION)" "new release"
