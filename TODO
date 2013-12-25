@@ -3,10 +3,11 @@
 * move default template to file?
 * add support for image files, now only lvm is supported
 * add support for lxc!
+* do even more error checking
 
 ---
 
-* maybe reimplement this with perl. bash is so clumsy...
+* maybe reimplement this with perl/ruby/python. bash is so clumsy...
 
 
 
