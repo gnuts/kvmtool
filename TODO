@@ -1,3 +1,4 @@
+* remove need for http server for preseed. --initrd-inject is the key!
 * add dependencies to debian control file
 * move salting scripts to files
 * move default template to file?
