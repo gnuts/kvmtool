@@ -1,8 +1,7 @@
+#!/usr/bin/make
+
 SHELL	 = /bin/bash
 
-#
-# 
-#
 PNAME    = kvmtool
 PDESC    = kvmtool - automatically create and wipe kvm domains, add salt to domains
 REPOSITORY = ispconfig.mawoh.org
@@ -13,23 +12,31 @@ USRPREFIX  ?= /usr
 VERSION  = $(shell head -n 1 VERSION)
 RELEASE  = $(shell head -n 1 RELEASE)
 REVISION = $(shell git log --pretty=format:'' | wc -l)
-USER     = $(shell git log --format="%an <%ae>" -1)
 
 BINDIR  = $(USRPREFIX)/bin
 SBINDIR = $(USRPREFIX)/sbin
 LIBDIR  = $(USRPREFIX)/lib/$(PNAME)
 VARLIBDIR  = /var/lib/$(PNAME)
 ETCDIR  = /etc/$(PNAME)
+RULESDIR= /lib/udev/rules.d
 
 INST_BINDIR   = $(DESTDIR)/$(BINDIR)
 INST_SBINDIR  = $(DESTDIR)/$(SBINDIR)
 INST_LIBDIR   = $(DESTDIR)/$(LIBDIR)
 INST_VARLIBDIR= $(DESTDIR)/$(VARLIBDIR)
 INST_ETCDIR   = $(DESTDIR)/$(ETCDIR)
+INST_RULESDIR = $(DESTDIR)/$(RULESDIR)
+
 
 
 help:
-	@echo "use the source - or add documentation"
+	@echo "do not use! it is not ready yet"
+	@echo "commands that work:"
+	@echo "make version		shows version of program"
+	@echo "make clean		removes tmp/cache files"
+	@echo "make upload		upload .deb packages to remote debian repo and update reprepo"
+	@echo "make package		create debian package"
+
 
 build: update-version
 
@@ -40,6 +47,7 @@ clean:
 	rm -f debian/cron.d
 	rm -rf itmp
 	rm -rf mtmp
+	rm -rf debian/$(PNAME)
 
 
 test:
@@ -67,23 +75,14 @@ install: clean update-doc
 	chown -vR root:root $(INST_ETCDIR)/
 	chmod -vR u=Xrw,go= $(INST_ETCDIR)/
 
-package: debian-package
-debian-package: set-debian-release
-	git commit -asm "package build $(VERSION).$(RELEASE)-$(REVISION)"
-	git tag -a "$(VERSION).$(RELEASE)-$(REVISION)"	
-	make changelog
-	git commit -asm "package build $(VERSION).$(RELEASE)-$(REVISION)"
-	make changelog
-	dpkg-buildpackage -ai386 -rfakeroot -us -uc
-	dpkg-buildpackage -aamd64 -rfakeroot -us -uc
-	make move-packages
-	@ls -1rt ../stable/*i386*deb|tail -n 1
-	@ls -1rt ../stable/*amd64*deb|tail -n 1
-	@ls -1rt ../unstable/*i386*deb|tail -n 1
-	@ls -1rt ../unstable/*amd64*deb|tail -n 1
+
+package: set-debian-release debian-package
+debian-package:
+	debuild --no-tgz-check -uc -us
+
 
 set-debian-release:
-	DEBEMAIL="$(USER)" dch -v "$(VERSION).$(RELEASE)-$(REVISION)" "new release"
+	dch -v "$(VERSION).$(RELEASE)-$(REVISION)" "new release"
 
 	
 increase-release:
@@ -109,11 +108,6 @@ new-release:
 	git commit -m "final commit before release change"
 	git tag -a "$(VERSION).$(RELEASE)"	
 	git push
-
-devlinks:
-	ln -svf $$(pwd)/bin/vpn-ca4 $(SBINDIR)/
-
-devupdate: reinstall devlinks
 
 move-packages:
 	@mkdir -p ../stable ../unstable

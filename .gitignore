@@ -3,3 +3,5 @@ etc/intranet.conf
 debian/kvmtool/*
 debian/kvmtool.debhelper.log
 debian/kvmtool.substvars
+debian/files
+Makefile.old
