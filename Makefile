@@ -36,6 +36,7 @@ help:
 	@echo "make clean		removes tmp/cache files"
 	@echo "make upload		upload .deb packages to remote debian repo and update reprepo"
 	@echo "make package		create debian package"
+	@echo "make bump		update debian changelog. use once when in release branch"
 
 
 build: update-version
@@ -80,7 +81,7 @@ package: set-debian-release debian-package
 debian-package:
 	debuild --no-tgz-check -uc -us
 
-
+bump: set-debian-release
 set-debian-release:
 	dch -v "$(VERSION).$(RELEASE)-$(REVISION)" "new release $(VERSION).$(RELEASE)-$(REVISION)"
 
