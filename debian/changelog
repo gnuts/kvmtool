@@ -1,8 +1,13 @@
-kvmtool (0.6-99) UNRELEASED; urgency=low
+kvmtool (0.7-115) UNRELEASED; urgency=low
 
+  [ Robert Einsle ]
   * new release
 
- -- Robert Einsle <robert.einsle@mawoh.de>  Tue, 14 May 2013 11:49:22 +0200
+  [ Matthias Nuessle ]
+  * new release
+  * new release
+
+ -- Matthias Nuessle <matthias.nuessle@mawoh.de>  Tue, 07 Jan 2014 13:00:07 +0100
 
 kvmtool (0.6-93) UNRELEASED; urgency=low
 
