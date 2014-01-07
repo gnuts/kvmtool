@@ -12,7 +12,6 @@ USRPREFIX  ?= /usr
 VERSION  = $(shell head -n 1 VERSION)
 RELEASE  = $(shell head -n 1 RELEASE)
 REVISION = $(shell git log --pretty=format:'' | wc -l)
-USER     = $(shell git log --format="%an <%ae>" -1)
 
 BINDIR  = $(USRPREFIX)/bin
 SBINDIR = $(USRPREFIX)/sbin
