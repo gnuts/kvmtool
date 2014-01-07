@@ -77,7 +77,7 @@ install: clean update-doc
 	chmod -vR u=Xrw,go= $(INST_ETCDIR)/
 
 
-package: debian-package
+package: set-debian-release debian-package
 debian-package:
 	debuild --no-tgz-check -uc -us
 
