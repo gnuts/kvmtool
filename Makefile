@@ -82,7 +82,7 @@ debian-package:
 
 
 set-debian-release:
-	dch -v "$(VERSION).$(RELEASE)-$(REVISION)" "new release"
+	dch -v "$(VERSION).$(RELEASE)-$(REVISION)" "new release $(VERSION).$(RELEASE)-$(REVISION)"
 
 	
 increase-release:
