@@ -17,6 +17,7 @@ BINDIR  = $(USRPREFIX)/bin
 SBINDIR = $(USRPREFIX)/sbin
 LIBDIR  = $(USRPREFIX)/lib/$(PNAME)
 VARLIBDIR  = /var/lib/$(PNAME)
+USRSHAREDIR = /usr/share/$(PNAME)
 ETCDIR  = /etc/$(PNAME)
 RULESDIR= /lib/udev/rules.d
 
@@ -24,6 +25,7 @@ INST_BINDIR   = $(DESTDIR)/$(BINDIR)
 INST_SBINDIR  = $(DESTDIR)/$(SBINDIR)
 INST_LIBDIR   = $(DESTDIR)/$(LIBDIR)
 INST_VARLIBDIR= $(DESTDIR)/$(VARLIBDIR)
+INST_USRSHAREDIR= $(DESTDIR)/$(USRSHAREDIR)
 INST_ETCDIR   = $(DESTDIR)/$(ETCDIR)
 INST_RULESDIR = $(DESTDIR)/$(RULESDIR)
 
@@ -60,21 +62,31 @@ update-doc:
 
 install: clean update-doc 
 	@echo "installing $(PNAME) $(VERSION).$(RELEASE)-$(REVISION)"
+	#
+	# create directories
+	#
 	mkdir -p $(INST_BINDIR)
 	mkdir -p $(INST_SBINDIR)
+	mkdir -p $(INST_USRSHAREDIR)
 	mkdir -p $(INST_ETCDIR)
 	mkdir -p $(INST_ETCDIR)/preseeds
 	#
 	# binaries
+	#
 	install -g root -o root -m 755 bin/kvmtool $(INST_SBINDIR)/
 	perl -p -i -e "s/^VERSION=noversion/VERSION='$(VERSION).$(RELEASE)-$(REVISION)'/" $(INST_SBINDIR)/kvmtool
 	#
 	# configuration
+	#
 	cp -a etc/preseeds/*default*.cfg $(INST_ETCDIR)/preseeds
 	cp -a etc/*.sh $(INST_ETCDIR)/
 	cp -a etc/authorized_keys $(INST_ETCDIR)/
 	chown -vR root:root $(INST_ETCDIR)/
 	chmod -vR u=Xrw,go= $(INST_ETCDIR)/
+	#
+	# support files
+	#
+	install u root -g root -m 644 share/default.template $(INST_USRSHAREDIR)
 
 
 package: debian-package
