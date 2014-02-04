@@ -16,6 +16,11 @@ VERSION=noversion
 #
 
 
+#
+# usage
+# -----
+# output commandline usage message and quit.
+#
 function usage {
 
 if [ -n "$1" ]; then
@@ -58,12 +63,24 @@ function die {
 
 # all vars in CONFVARS must be set when creating or wiping, or sanitycheck() will bail out
 CONFVARS="LOCATION PRESEEDSOURCEDIR PRESEEDTARGET PRESEEDSERVER KVMHOST DNSDOMAIN VCPUS RAM SIZE PVNAME GRAPHICS NETWORK PRESEEDNAME LATESETUP OTHERSETUP NAME NETWORK HOSTNETWORKSETUP CPU OSTYPE VIRTTYPE ASKBEFORECREATE ASKBEFOREWIPE ASKBEFORESALT SALTMETHOD IP SALTMASTER LATESCRIPT PRESEEDFILES DOMAINIMAGEPATH AUTOSTARTDOMAIN AUTOSALTDOMAIN"
+
+#
+# output template
+# ---------------
+# print a default configuration file to STDOUT
+#
 function output_template {
     cat /usr/share/kvmtool/default.config
 }
 
 
 
+#
+# sanitycheck
+# -----------
+# makes sure every variable defined in $CONFVARS is defined.
+# script bails out if not.
+#
 function sanitycheck {
     for v in $CONFVARS; do
         x=$(eval echo -n "\$$v")
@@ -74,13 +91,31 @@ function sanitycheck {
     D "configuration is valid"
 }
 
-
-function create_domain {
-    set -e 
-
+#
+# exists domain
+# -------------
+# check if domain exists, return true if so. 
+#
+function exists_domain {
     D "checking whether $NAME already exists..."
     # check whether a $name domain already exists
     if virsh -c "$KVMHOST" domid "$NAME" >/dev/null 2>&1; then
+        return 1
+    fi
+
+    return 0
+}
+
+#
+# create domain
+# -------------
+#
+# 
+#
+function create_domain {
+    set -e 
+
+    if exists_domain; then
         die "there already is a domain called $NAME bailing out"
     fi
 
