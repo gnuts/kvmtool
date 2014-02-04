@@ -86,7 +86,10 @@ install: clean update-doc
 	#
 	# support files
 	#
-	install u root -g root -m 644 share/default.template $(INST_USRSHAREDIR)
+	install u root -g root -m 644 share/default.template    $(INST_USRSHAREDIR)
+	install u root -g root -m 644 share/salt-script.wheezy  $(INST_USRSHAREDIR)
+	install u root -g root -m 644 share/salt-script.squeeze $(INST_USRSHAREDIR)
+	install u root -g root -m 644 share/salt-script.ubuntu  $(INST_USRSHAREDIR)
 
 
 package: debian-package

@@ -285,46 +285,18 @@ EOL
     fi 
 
     script=$(mktemp)
+    # todo: make script location more configurable?!
+    # todo: is this deployment feature even needed anymore?!
     case $SALTMETHOD in
-
         wheezy)
-
-            cat >"$script" << EOL
-#!/bin/bash
-set -e
-echo "deb http://debian.saltstack.com/debian wheezy-saltstack main" >/etc/apt/sources.list.d/salt.list 
-wget -q -O- "http://debian.saltstack.com/debian-salt-team-joehealy.gpg.key" | apt-key add -
-apt-get update
-apt-get -y install salt-minion
-perl -p -i -e 's/^\#master: salt/master: $SALTMASTER/' /etc/salt/minion
-/etc/init.d/salt-minion restart
-EOL
+            cat >"$script" < /usr/share/kvmtool/salt-script.wheezy
             ;;
         squeeze)
+            cat >"$script" < /usr/share/kvmtool/salt-script.squeeze
 
-            cat >"$script" << EOL
-#!/bin/bash
-set -e
-echo "deb http://debian.saltstack.com/debian squeeze-saltstack main" >/etc/apt/sources.list.d/salt.list 
-echo "deb http://backports.debian.org/debian-backports squeeze-backports main contrib non-free" >>/etc/apt/sources.list.d/salt.list
-wget -q -O- "http://debian.saltstack.com/debian-salt-team-joehealy.gpg.key" | apt-key add -
-apt-get update
-apt-get -y install salt-minion
-perl -p -i -e 's/^\#master: salt/master: $SALTMASTER/' /etc/salt/minion
-/etc/init.d/salt-minion restart
-EOL
             ;;
         ubuntu)
-            cat >"$script" << EOL
-#!/bin/bash
-set -e
-apt-get -y install software-properties-common
-add-apt-repository -y ppa:saltstack/salt
-apt-get update
-apt-get -y install salt-minion
-perl -p -i -e 's/^\#master: salt/master: $SALTMASTER/' /etc/salt/minion
-restart salt-minion
-EOL
+            cat >"$script" < /usr/share/kvmtool/salt-script.ubuntu
         ;;
         *)
             die "unknown salting method"
