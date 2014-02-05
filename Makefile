@@ -9,9 +9,8 @@ REPODIR = /var/www/clients/client1/web22/web
 
 DESTDIR ?= /
 USRPREFIX  ?= /usr
-VERSION  = $(shell head -n 1 VERSION)
-RELEASE  = $(shell head -n 1 RELEASE)
-REVISION = $(shell git log --pretty=format:'' | wc -l)
+BUILD    = $(shell git log --pretty=format:'' | wc -l)
+DEBVERSION = $(shell dpkg-parsechangelog|grep Version:|cut -d" " -f2-)
 
 BINDIR  = $(USRPREFIX)/bin
 SBINDIR = $(USRPREFIX)/sbin
@@ -39,6 +38,17 @@ help:
 	@echo "make upload		upload .deb packages to remote debian repo and update reprepo"
 	@echo "make package		create debian package"
 	@echo "make bump		update debian changelog. use once when in release branch"
+	@echo ""
+	@echo ""
+	@echo "more functions:"
+	@echo "make increase-revision	increment the third element of the version number"
+	@echo "make reset-revision		reset the third element of the version number to 1"
+	@echo "make increase-release	increment the second element of the version number"
+	@echo ""
+	@echo ""
+	#@echo "when creating a new release:"
+	#@echo "make bump package"
+
 
 
 build: update-version
@@ -61,7 +71,7 @@ update-doc:
 	echo "no docs"
 
 install: clean update-doc 
-	@echo "installing $(PNAME) $(VERSION).$(RELEASE) build $(REVISION)"
+	@echo "installing $(PNAME) $(DEBVERSION) build $(BUILD)"
 	#
 	# create directories
 	#
@@ -74,7 +84,7 @@ install: clean update-doc
 	# binaries
 	#
 	install -g root -o root -m 755 bin/kvmtool $(INST_SBINDIR)/
-	perl -p -i -e "s/^VERSION=noversion/VERSION='$(VERSION).$(RELEASE)'/" $(INST_SBINDIR)/kvmtool
+	perl -p -i -e "s/^VERSION=noversion/VERSION='$(DEBVERSION)'/" $(INST_SBINDIR)/kvmtool
 	#
 	# configuration
 	#
@@ -92,52 +102,33 @@ install: clean update-doc
 	install -o root -g root -m 644 share/salt-script.ubuntu  $(INST_USRSHAREDIR)
 
 
-package: debian-package
+package: debian-package move-packages
 debian-package:
 	debuild --no-tgz-check -uc -us
 
+move-packages:
+	@mkdir -p ../packages
+	@mv -v ../$(PNAME)_* ../packages
+	@echo ""
+	@echo ""
+	@echo "latest package:"
+	@ls -lrt ../packages/*.deb|tail -n1
+
 bump: set-debian-release
 set-debian-release:
-	dch -v "$(VERSION).$(RELEASE)" "new release $(VERSION).$(RELEASE) build $(REVISION)"
+	@dpkg-parsechangelog|grep Version:
+	@nv=$$(echo "$(DEBVERSION)" | perl -ne '/^(.*)\.(\d+)/ or die; $$b=$$2+1; print "$$1.$$b"') && \
+	dch  --force-distribution -D stable -v "$$nv" "new release" 2>/dev/null
+	@echo -n "new ";dpkg-parsechangelog|grep Version:
+	@echo "use dch -e if this is not the version you want."
 
 	
-increase-release:
-	@cat RELEASE|perl -pe '$$_++' >RELEASE.new
-	@mv RELEASE.new RELEASE
-	make version
-
-update-version-files:
-	@head -n 1 debian/changelog | \
-	perl -ne '/\(([\d\.]+)\.(\d+)\-(\d+)\)/ and print "$$1\n"' >VERSION
-	@head -n 1 debian/changelog | \
-	perl -ne '/\(([\d\.]+)\.(\d+)\-(\d+)\)/ and print "$$2\n"' >RELEASE
-
 version: status
 status:
-	@echo "this is $(PNAME) $(VERSION).$(RELEASE) build $(REVISION)"
+	@echo "this is $(PNAME) $(DEBVERSION) build $(BUILD)"
 
-new-release:
-	@echo "are you sure you want to increase the release number $(RELEASE)?"
-	@echo "press ENTER to continue or C-c to abort"
-	@read
-	make increase-release set-debian-release update-version-files
-	git commit -m "final commit before release change"
-	git tag -a "$(VERSION).$(RELEASE)"	
-	git push
+#upload: move-packages
+#	rsync -vP ../stable/*deb root@$(REPOSITORY):/tmp/ 
+#	ssh -l root $(REPOSITORY) 'cd $(REPODIR) && for f in /tmp/*deb; do reprepro includedeb squeeze $$f;done'
+#
 
-move-packages:
-	@mkdir -p ../stable ../unstable
-	@(mv -v ../$(PNAME)_*.*1-*.* ../unstable 2>&1|grep -v 'cannot stat') || true
-	@(mv -v ../$(PNAME)_*.*3-*.* ../unstable 2>&1|grep -v 'cannot stat') || true
-	@(mv -v ../$(PNAME)_*.*5-*.* ../unstable 2>&1|grep -v 'cannot stat') || true
-	@(mv -v ../$(PNAME)_*.*7-*.* ../unstable 2>&1|grep -v 'cannot stat') || true
-	@(mv -v ../$(PNAME)_*.*9-*.* ../unstable 2>&1|grep -v 'cannot stat') || true
-	@(mv -v ../$(PNAME)_*.* ../stable 2>&1|grep -v 'cannot stat') || true
-
-upload: move-packages
-	rsync -vP ../stable/*deb root@$(REPOSITORY):/tmp/ 
-	ssh -l root $(REPOSITORY) 'cd $(REPODIR) && for f in /tmp/*deb; do reprepro includedeb squeeze $$f;done'
-
-
-changelog:
-	git log --data-order --date=short sed -e '/^commit.*$$/d' | awk '/^Author/ {sub(/\\$$/,""); getline t; print $$0 t; next}; 1' | sed -e 's/^Author: //g' | sed -e 's/>Date:   \([0-9]*-[0-9]*-[0-9]*\)/>\t\1/g' | sed -e 's/^\(.*\) \(\)\t\(.*\)/\3    \1    \2/g' > CHANGELOG
