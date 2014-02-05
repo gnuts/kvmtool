@@ -61,7 +61,7 @@ update-doc:
 	echo "no docs"
 
 install: clean update-doc 
-	@echo "installing $(PNAME) $(VERSION).$(RELEASE)-$(REVISION)"
+	@echo "installing $(PNAME) $(VERSION).$(RELEASE) build $(REVISION)"
 	#
 	# create directories
 	#
@@ -74,7 +74,7 @@ install: clean update-doc
 	# binaries
 	#
 	install -g root -o root -m 755 bin/kvmtool $(INST_SBINDIR)/
-	perl -p -i -e "s/^VERSION=noversion/VERSION='$(VERSION).$(RELEASE)-$(REVISION)'/" $(INST_SBINDIR)/kvmtool
+	perl -p -i -e "s/^VERSION=noversion/VERSION='$(VERSION).$(RELEASE)'/" $(INST_SBINDIR)/kvmtool
 	#
 	# configuration
 	#
@@ -98,7 +98,7 @@ debian-package:
 
 bump: set-debian-release
 set-debian-release:
-	dch -v "$(VERSION).$(RELEASE)-$(REVISION)" "new release $(VERSION).$(RELEASE)-$(REVISION)"
+	dch -v "$(VERSION).$(RELEASE)" "new release $(VERSION).$(RELEASE) build $(REVISION)"
 
 	
 increase-release:
@@ -114,7 +114,7 @@ update-version-files:
 
 version: status
 status:
-	@echo "this is $(PNAME) $(VERSION).$(RELEASE)-$(REVISION)"
+	@echo "this is $(PNAME) $(VERSION).$(RELEASE) build $(REVISION)"
 
 new-release:
 	@echo "are you sure you want to increase the release number $(RELEASE)?"
