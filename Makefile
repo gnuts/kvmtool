@@ -1,38 +1,37 @@
 #!/usr/bin/make
 
-SHELL	 = /bin/bash
+PNAME    		= kvmtool
+PDESC    		= kvmtool - automatically create and wipe kvm domains, add salt to domains
 
-PNAME    = kvmtool
-PDESC    = kvmtool - automatically create and wipe kvm domains, add salt to domains
-REPOSITORY = ispconfig.mawoh.org
-REPODIR = /var/www/clients/client1/web22/web
+REPOSITORY 		= ispconfig.mawoh.org
+REPODIR 		= /var/www/clients/client1/web22/web
 
-DESTDIR ?= /
-USRPREFIX  ?= /usr
-BUILD    = $(shell git log --pretty=format:'' | wc -l)
-DEBVERSION = $(shell dpkg-parsechangelog|grep Version:|cut -d" " -f2-)
+DESTDIR 		?= /
+USRPREFIX  		?= /usr
+BUILD    		= $(shell git log --pretty=format:'' | wc -l)
+DEBVERSION 		= $(shell dpkg-parsechangelog|grep Version:|cut -d" " -f2-)
 
-BINDIR  = $(USRPREFIX)/bin
-SBINDIR = $(USRPREFIX)/sbin
-LIBDIR  = $(USRPREFIX)/lib/$(PNAME)
-VARLIBDIR  = /var/lib/$(PNAME)
-USRSHAREDIR = /usr/share/$(PNAME)
-ETCDIR  = /etc/$(PNAME)
-RULESDIR= /lib/udev/rules.d
+BINDIR  		= $(USRPREFIX)/bin
+SBINDIR 		= $(USRPREFIX)/sbin
+LIBDIR  		= $(USRPREFIX)/lib/$(PNAME)
+VARLIBDIR  		= /var/lib/$(PNAME)
+USRSHAREDIR 	= /usr/share/$(PNAME)
+ETCDIR			= /etc/$(PNAME)
+RULESDIR		= /lib/udev/rules.d
 
-INST_BINDIR   = $(DESTDIR)/$(BINDIR)
-INST_SBINDIR  = $(DESTDIR)/$(SBINDIR)
-INST_LIBDIR   = $(DESTDIR)/$(LIBDIR)
-INST_VARLIBDIR= $(DESTDIR)/$(VARLIBDIR)
+INST_BINDIR		= $(DESTDIR)/$(BINDIR)
+INST_SBINDIR  	= $(DESTDIR)/$(SBINDIR)
+INST_LIBDIR   	= $(DESTDIR)/$(LIBDIR)
+INST_VARLIBDIR	= $(DESTDIR)/$(VARLIBDIR)
 INST_USRSHAREDIR= $(DESTDIR)/$(USRSHAREDIR)
-INST_ETCDIR   = $(DESTDIR)/$(ETCDIR)
-INST_RULESDIR = $(DESTDIR)/$(RULESDIR)
+INST_ETCDIR   	= $(DESTDIR)/$(ETCDIR)
+INST_RULESDIR 	= $(DESTDIR)/$(RULESDIR)
+
+SHELL	 		= /bin/bash
 
 
 
 help:
-	@echo "do not use! it is not ready yet"
-	@echo "commands that work:"
 	@echo "make version		shows version of program"
 	@echo "make clean		removes tmp/cache files"
 	@echo "make upload		upload .deb packages to remote debian repo and update reprepo"
@@ -46,8 +45,7 @@ help:
 	@echo "make increase-release	increment the second element of the version number"
 	@echo ""
 	@echo ""
-	#@echo "when creating a new release:"
-	#@echo "make bump package"
+	@echo "when creating a new release:"
 
 
 
