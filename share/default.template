@@ -25,6 +25,13 @@ ASKBEFORECREATE=yes
 ASKBEFOREWIPE=yes
 ASKBEFORESALT=yes
 
+# if INJECTPRESEED is set PRESEEDSERVER is not used and
+# the preseed file is instead injected with --initrd-inject
+# set to exaktly "NO" if you want to use PRESEEDSERVER
+INJECTPRESEED=yes
+
+
+
 # proxies to use when loading $LOCATION
 # this is not the proxy that will be used during installation in the guest!
 export http_proxy="http://10.1.1.22:8080"
@@ -87,7 +94,7 @@ PRESEEDFILES="authorized_keys"
 # LATESCRIPT: script to transfer to remote host and run.
 # will be searched in config dir
 # latescript will be called with the preseed server URL as first arg
-# set to NO if you do not need that
+# set to exactly "NO" if you do not need that
 LATESCRIPT="latescript_squeeze.sh"
 
 
@@ -115,7 +122,7 @@ mirror/http/proxy=http://10.1.1.22:8080 \
 # OTHERSETUP: add additional virt-install --extra-args here. e.g. setting a default root password.
 OTHERSETUP="passwd/root-password=yourFunny24324-Password"
 
-# LATESETUP: you should not change this. use LATESCRIPT!
+# LATESETUP: you should not change this. use LATESCRIPT to run stuff directly after installation!
 LATESETUP="preseed/late_command=\"cd /tmp && for f in $LATESCRIPT $PRESEEDFILES; do wget $PRESEEDSERVER/\$f; done; sh $LATESCRIPT $PRESEEDSERVER\""
 
 #

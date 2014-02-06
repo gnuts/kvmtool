@@ -67,7 +67,7 @@ function die {
 }
 
 # all vars in CONFVARS must be set when creating or wiping, or sanitycheck() will bail out
-CONFVARS="LOCATION PRESEEDSOURCEDIR PRESEEDTARGET PRESEEDSERVER KVMHOST DNSDOMAIN VCPUS RAM SIZE PVNAME GRAPHICS NETWORK PRESEEDNAME LATESETUP OTHERSETUP NAME NETWORK HOSTNETWORKSETUP CPU OSTYPE VIRTTYPE ASKBEFORECREATE ASKBEFOREWIPE ASKBEFORESALT SALTMETHOD IP SALTMASTER LATESCRIPT PRESEEDFILES DOMAINIMAGEPATH AUTOSTARTDOMAIN AUTOSALTDOMAIN"
+CONFVARS="LOCATION PRESEEDSOURCEDIR PRESEEDTARGET PRESEEDSERVER KVMHOST DNSDOMAIN VCPUS RAM SIZE PVNAME GRAPHICS NETWORK PRESEEDNAME LATESETUP OTHERSETUP NAME NETWORK HOSTNETWORKSETUP CPU OSTYPE VIRTTYPE ASKBEFORECREATE ASKBEFOREWIPE ASKBEFORESALT SALTMETHOD IP SALTMASTER LATESCRIPT PRESEEDFILES DOMAINIMAGEPATH AUTOSTARTDOMAIN AUTOSALTDOMAIN INJECTPRESEED"
 
 #
 # output template
@@ -75,7 +75,7 @@ CONFVARS="LOCATION PRESEEDSOURCEDIR PRESEEDTARGET PRESEEDSERVER KVMHOST DNSDOMAI
 # print a default configuration file to STDOUT
 #
 function output_template {
-    cat /usr/share/kvmtool/default.config
+    cat /usr/share/kvmtool/default.template
 }
 
 
@@ -104,10 +104,10 @@ function exists_domain {
     D "checking whether $NAME already exists..."
     # check whether a $name domain already exists
     if virsh -c "$KVMHOST" domid "$NAME" >/dev/null 2>&1; then
-        return 1
+        return 0
     fi
 
-    return 0
+    return 1
 }
 
 #
@@ -164,10 +164,19 @@ EOL
     read
     fi 
 
-    D "copy preseed file to webserver..."
-    rsync -a "$preseedcfg" "$PRESEEDTARGET"
+    injectsetup=""
+    preseedsetup=""
 
-    if [ "$LATESETUP" == "NO" ]; then
+    if [ "$INJECTPRESEED" == "NO" ]; then
+        D "copy preseed file to webserver..."
+        rsync -a "$preseedcfg" "$PRESEEDTARGET"
+        preseedurlsetup="url=\"$preseedurl\""
+    else
+        D "injecting preseed file"
+        injectsetup="--initrd-inject=\"$preseedcfg\""
+    fi
+
+    if [ "$LATESCRIPT" == "NO" ]; then
         LATESETUP=""
         D "no latesetup configured"
     else
@@ -192,8 +201,9 @@ EOL
         --network="$NETWORK" \
         --graphics="$GRAPHICS" \
         $disksetup \
+        $injectsetup \
         --location="$LOCATION" \
-        --extra-args="auto=true hostname=$NAME domain=$DNSDOMAIN $LATESETUP $HOSTNETWORKSETUP $OTHERSETUP url=$preseedurl"
+        --extra-args="auto=true hostname=$NAME domain=$DNSDOMAIN $LATESETUP $HOSTNETWORKSETUP $OTHERSETUP $preseedsetup $preseedurlsetup"
 
     if [ "$AUTOSTARTDOMAIN" == "YES" ]; then
         virsh --connect="$KVMHOST" "autostart $NAME"
@@ -207,20 +217,21 @@ EOL
 #
 function load_config {
     local domain="$1"
-    local default="$3" 
+    local default="$2" 
     # load domain config
     domainconf="$KVMTOOLCONFIGDIR/$domain.conf"
     defaultconf="$KVMTOOLCONFIGDIR/$default.conf"
 
     if   [ ! -f "$domainconf" ]; then
-        die "error: $domainconf not found"
+        die "error: domainconf  $domainconf not found"
     fi
 
     if   [ ! -f "$defaultconf" ]; then
-        die "error: $defaultconf not found"
+        die "error: defaultconf $defaultconf not found"
     fi
 
     # first load domain config to allow early setup, then default config then domain config again...
+    # this helps to make all vars resolvable and to override defaults with per domain config
     source "$domainconf"
     source "$defaultconf"
     source "$domainconf"
@@ -315,7 +326,7 @@ EOL
 # ----------------------------------
 #
 function cmd_create {
-    D "create mode"
+    D "create mode ($1,$2)"
     load_config "$1" "$2"
     create_domain
 
@@ -342,8 +353,7 @@ function cmd_create {
 # --------------------------------
 #
 function cmd_wipe {
-    D "wipe mode $*"
-    [ "$2" == "like" ] || usage "wipe command syntax error"
+    D "wipe mode ($1,$2)"
     load_config "$1" "$2"
     wipe_domain
 }
@@ -353,8 +363,8 @@ function cmd_wipe {
 # cmd_salt $domain $default
 # --------------------------------
 #
-function cmd_salt {
-    D "salt mode $*"
+function cmd_salt { 
+    D "salt mode ($1,$2)"
     load_config "$1" "$2"
     salt_domain
 }
