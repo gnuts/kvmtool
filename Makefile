@@ -32,21 +32,17 @@ SHELL	 		= /bin/bash
 
 
 help:
-	@echo "make version		shows version of program"
-	@echo "make clean		removes tmp/cache files"
-	@echo "make upload		upload .deb packages to remote debian repo and update reprepo"
-	@echo "make package		create debian package"
-	@echo "make bump		update debian changelog. use once when in release branch"
 	@echo ""
+	@echo "This is the Makefile for $(PNAME) $(DEBVERSION)"
 	@echo ""
-	@echo "more functions:"
-	@echo "make increase-revision	increment the third element of the version number"
-	@echo "make reset-revision		reset the third element of the version number to 1"
-	@echo "make increase-release	increment the second element of the version number"
+	@echo "help     this help"
+	@echo "version  shows version of $(PNAME) taken from debian/changelog"
+	@echo "release  starts workflow to increase version number, create a debian package, and create a git release"
 	@echo ""
+	@echo "clean    removes tmp/cache files"
+	@echo "upload   upload .deb packages to remote debian repo and update reprepo"
+	@echo "package  create debian package"
 	@echo ""
-	@echo "when creating a new release:"
-
 
 
 build: update-version
@@ -112,8 +108,9 @@ move-packages:
 	@echo "latest package:"
 	@ls -lrt ../packages/*.deb|tail -n1
 
-bump: set-debian-release
+release: set-debian-release
 set-debian-release:
+	@if ! git branch --no-color |grep -q '\* develop$$'; then echo "not in branch develop. merge your changes to develop and try again."; exit 1; fi
 	@if [ -n "$$(git status -s|grep -vE '^\?')" ]; then echo "there a uncommitted changes. aborting"; exit 1; fi
 	@if [ -n "$$(git status -s)" ]; then git status -s;echo;echo "there are new files. press CTRL-c to abort or ENTER to continue"; read; fi
 	@echo -n "current " && dpkg-parsechangelog|grep Version:
@@ -123,9 +120,9 @@ set-debian-release:
 		read -ei "$$nv" v && \
 		[ -n "$$v" ] || v="$$nv" && \
 		echo "ok, new version will be $$v" && \
-		NEWVERSION="$$v" make release
+		NEWVERSION="$$v" make bump
 
-release:
+bump:
 	@if [ -z "$(NEWVERSION)" ]; then echo "need NEWVERSION env var";exit 1;fi
 	@echo "starting release $(NEWVERSION)"
 	git flow release start "$(NEWVERSION)"
@@ -134,7 +131,7 @@ release:
 	@echo "now run at least the following commands:"
 	@echo "# make package"
 	@echo "# git commit -av"
-	@echo "# git flow release finish"
+	@echo "# git flow release finish $(NEWVERSION)"
 	@echo "# git push"
 	@echo "# git push --tags"
 
