@@ -115,7 +115,7 @@ move-packages:
 bump: set-debian-release
 set-debian-release:
 	@if [ -n "$$(git status -s|grep -vE '^\?')" ]; then echo "there a uncommitted changes. aborting"; exit 1; fi
-	@if [ -n "$$(git status -s)" ]; then echo "there are new files. press CTRL-c to abort or ENTER to continue"; read; fi
+	@if [ -n "$$(git status -s)" ]; then git status -s;echo;echo "there are new files. press CTRL-c to abort or ENTER to continue"; read; fi
 	@echo -n "current " && dpkg-parsechangelog|grep Version:
 	@nv=$$(echo "$(DEBVERSION)" | perl -ne '/^(.*)\.(\d+)/ or die; $$b=$$2+1; print "$$1.$$b"') && \
 		echo "enter new version number or press CTRL-c to abort" && \
