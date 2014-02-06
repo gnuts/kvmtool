@@ -114,13 +114,30 @@ move-packages:
 
 bump: set-debian-release
 set-debian-release:
-	@dpkg-parsechangelog|grep Version:
+	@if [ -n "$$(git status -s|grep -vE '^\?')" ]; then echo "there a uncommitted changes. aborting"; exit 1; fi
+	@if [ -n "$$(git status -s)" ]; then echo "there are new files. press CTRL-c to abort or ENTER to continue"; read; fi
+	@echo -n "current " && dpkg-parsechangelog|grep Version:
 	@nv=$$(echo "$(DEBVERSION)" | perl -ne '/^(.*)\.(\d+)/ or die; $$b=$$2+1; print "$$1.$$b"') && \
-	dch  --force-distribution -D stable -v "$$nv" "new release" 2>/dev/null
-	@echo -n "new ";dpkg-parsechangelog|grep Version:
-	@echo "use dch -e if this is not the version you want."
+		echo "enter new version number or press CTRL-c to abort" && \
+		echo -n "new version [$$nv]: " && \
+		read -ei "$$nv" v && \
+		[ -n "$$v" ] || v="$$nv" && \
+		echo "ok, new version will be $$v" && \
+		NEWVERSION="$$v" make release
 
-	
+release:
+	@if [ -z "$(NEWVERSION)" ]; then echo "need NEWVERSION env var";exit 1;fi
+	@echo "starting release $(NEWVERSION)"
+	git flow release start "$(NEWVERSION)"
+	dch  --force-distribution -D stable -v "$(NEWVERSION)" "new release" 2>/dev/null
+	@echo -n "Debian new ";dpkg-parsechangelog|grep Version:
+	@echo "now run at least the following commands:"
+	@echo "# make package"
+	@echo "# git commit -av"
+	@echo "# git flow release finish"
+	@echo "# git push"
+	@echo "# git push --tags"
+
 version: status
 status:
 	@echo "this is $(PNAME) $(DEBVERSION) build $(BUILD)"
