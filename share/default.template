@@ -5,6 +5,12 @@
 # LOCATION: installer location for webbased virt-install
 LOCATION="http://ftp.debian.org/debian/dists/squeeze/main/installer-amd64/"
 
+# iso image based installation does not work well with automated installation,
+# so the feature is not implemented.
+# ### CDROM: location of iso image to use for installation
+# ### if this is "", LOCATION will be used
+# ### CDROM="/var/lib/libvirt/images/debian-7.3.0-amd64-netinst.iso"
+
 # PRESEEDSOURCEDIR: directory below /etc/kvmtool where preseed.cfg files are stored
 PRESEEDSOURCEDIR="preseeds"
 
@@ -85,22 +91,29 @@ PVNAME="vg0"
 DOMAINIMAGEPATH="/some/path"
 
 # PRESEEDNAME: preseed file name. without .cfg extension and path!
-PRESEEDNAME="debian_squeeze_default"
+PRESEEDNAME="debian_wheezy_default"
 
 # PRESEEDFILES: additional files to copy to the preseedserver
 # will be searched in config dir. do not use paths! only filenames work for now.
 PRESEEDFILES="authorized_keys"
 
-# LATESCRIPT: script to transfer to remote host and run.
+# LATESCRIPT: script to transfer to remote host and run if INJECTPRESEED is NOT set
 # will be searched in config dir
 # latescript will be called with the preseed server URL as first arg
 # set to exactly "NO" if you do not need that
-LATESCRIPT="latescript_squeeze.sh"
+LATESCRIPT="latescript_wheezy.sh"
 
+# LATESCRIPTINJECT: script to inject if INJECTPRESEED is set
+# will be searched in config dir
+# latescriptinject will be called with no arguments
+# all preseedfiles and the script are found directly in /
+# all preseedfiles and the script will be deleted after execution
+# set to exactly "NO" to disable
+LATESCRIPTINJECT="latescript_inject.sh"
 
 # SALTMETHOD: Method to use when installing salt on a target.
 # possible values: "squeeze","wheezy", "ubuntu" (tested with 13.04)
-SALTMETHOD="squeeze"
+SALTMETHOD="wheezy"
 
 # NETWORK: guest network hardware setup. read manual page of virt-install for details
 NETWORK="network=default"
@@ -124,6 +137,10 @@ OTHERSETUP="passwd/root-password=yourFunny24324-Password"
 
 # LATESETUP: you should not change this. use LATESCRIPT to run stuff directly after installation!
 LATESETUP="preseed/late_command=\"cd /tmp && for f in $LATESCRIPT $PRESEEDFILES; do wget $PRESEEDSERVER/\$f; done; sh $LATESCRIPT $PRESEEDSERVER\""
+#
+# LATESETUPINJECT: you should not change this. use LATESCRIPTINJECT to run stuff directly after installation!
+LATESETUPINJECT="preseed/late_command=\"cd / && sh $LATESCRIPT\" && rm $LATESCRIPT $PRESEEDFILES"
+
 
 #
 # host specific configuration
