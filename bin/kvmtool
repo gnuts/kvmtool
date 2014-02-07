@@ -67,7 +67,7 @@ function die {
 }
 
 # all vars in CONFVARS must be set when creating or wiping, or sanitycheck() will bail out
-CONFVARS="LOCATION PRESEEDSOURCEDIR PRESEEDTARGET PRESEEDSERVER KVMHOST DNSDOMAIN VCPUS RAM SIZE PVNAME GRAPHICS NETWORK PRESEEDNAME LATESETUP OTHERSETUP NAME NETWORK HOSTNETWORKSETUP CPU OSTYPE VIRTTYPE ASKBEFORECREATE ASKBEFOREWIPE ASKBEFORESALT SALTMETHOD IP SALTMASTER LATESCRIPT PRESEEDFILES DOMAINIMAGEPATH AUTOSTARTDOMAIN AUTOSALTDOMAIN INJECTPRESEED"
+CONFVARS="LOCATION PRESEEDSOURCEDIR PRESEEDTARGET PRESEEDSERVER KVMHOST DNSDOMAIN VCPUS RAM SIZE PVNAME GRAPHICS NETWORK PRESEEDNAME LATESETUP OTHERSETUP NAME NETWORK HOSTNETWORKSETUP CPU OSTYPE VIRTTYPE ASKBEFORECREATE ASKBEFOREWIPE ASKBEFORESALT SALTMETHOD IP SALTMASTER LATESCRIPT LATESCRIPTINJECT PRESEEDFILES DOMAINIMAGEPATH AUTOSTARTDOMAIN AUTOSALTDOMAIN INJECTPRESEED"
 
 #
 # output template
@@ -168,23 +168,36 @@ EOL
     preseedsetup=""
 
     if [ "$INJECTPRESEED" == "NO" ]; then
+        
         D "copy preseed file to webserver..."
         rsync -a "$preseedcfg" "$PRESEEDTARGET"
         preseedurlsetup="url=\"$preseedurl\""
+        if [ "$LATESCRIPT" == "NO" ]; then
+            LATESETUP=""
+            D "no latesetup configured"
+        else
+            D "copy additional files to webserver..."
+            for f in $LATESCRIPT $PRESEEDFILES; do
+                rsync -a "$KVMTOOLCONFIGDIR/$f" "$PRESEEDTARGET"
+            done
+        fi
     else
         D "injecting preseed file"
-        injectsetup="--initrd-inject=\"$preseedcfg\""
+        # create temp dir, copy preseed there
+        tmpdir=$(mktemp -d)
+        preseedcfgtmp="$tmpdir/preseed.cfg"
+        cp -v "$preseedcfg" "$preseedcfgtmp"
+        injectsetup="--initrd-inject=$preseedcfgtmp"
+        if [ "$LATESCRIPTINJECT" == "NO" ]; then
+            LATESETUP=""
+            D "no latesetup configured"
+        else
+            for f in $LATESCRIPTINJECT $PRESEEDFILES; do
+                injectsetup="$injectsetup --initrd-inject=$KVMTOOLCONFIGDIR/$f"
+            done
+        fi
     fi
 
-    if [ "$LATESCRIPT" == "NO" ]; then
-        LATESETUP=""
-        D "no latesetup configured"
-    else
-        D "copy additional files to webserver..."
-        for f in $LATESCRIPT $PRESEEDFILES; do
-            rsync -a "$KVMTOOLCONFIGDIR/$f" "$PRESEEDTARGET"
-        done
-    fi
 
     D "create domain $NAME"
     time virt-install \
@@ -203,7 +216,13 @@ EOL
         $disksetup \
         $injectsetup \
         --location="$LOCATION" \
-        --extra-args="auto=true hostname=$NAME domain=$DNSDOMAIN $LATESETUP $HOSTNETWORKSETUP $OTHERSETUP $preseedsetup $preseedurlsetup"
+        --extra-args="auto=true hostname=$NAME domain=$DNSDOMAIN $LATESETUP $LATESETUPINJECT $HOSTNETWORKSETUP $OTHERSETUP $preseedsetup $preseedurlsetup"
+
+    # remove tmp files
+    if [ -n "$preseedcfgtmp" ]; then
+        rm "$preseedcfgtmp"
+        rmdir "$tmpdir"
+    fi
 
     if [ "$AUTOSTARTDOMAIN" == "YES" ]; then
         virsh --connect="$KVMHOST" "autostart $NAME"
