@@ -1,5 +1,6 @@
 * remove need for http server for preseed. --initrd-inject is the key!
     see http://honk.sigxcpu.org/con/Preseeding_Debian_virtual_machines_with_virt_install.html
+* add BRIDGE support
 * add dependencies to debian control file
 * move salting scripts to files
 * move default template to file?
