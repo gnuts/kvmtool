@@ -4,10 +4,11 @@ Priority: extra
 Maintainer: Matthias Nuessle <matthias.nuessle@mawoh.de>
 Build-Depends: debhelper (>= 7.0.50~)
 Standards-Version: 3.8.4
-Homepage: <insert the upstream URL, if relevant>
+Homepage: https://github.com/gnuts/kvmtool
 
 Package: kvmtool
 Architecture: all
 Depends: ${shlibs:Depends}, ${misc:Depends}
-Description: <insert up to 60 chars description>
- <insert long description, indented with spaces>
+Description: A tool to create KVM and LXC virtual hosts in an automated manner
+ With kvmtool you can create profiles and guest configurations that can be used
+ to bootstrap guest systems for KVM and LXC.

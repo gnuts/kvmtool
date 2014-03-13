@@ -3,19 +3,25 @@
 #set -x
 VERSION=noversion
 #
-# create kvm domain
-# * default config
-# * domain config
-# * preseed file
-#
-# delete kvm domain
-# * destroy and undefine domain
-# * destroy and undefine lv
-#
-# install salt on various OS Distributions
+# todo: add description
+# todo: add copyright notice
 #
 
 
+# D $message
+# ----------
+# debug output goes to stderr
+#
+function D {
+    echo "$*" 1>&2
+}
+
+#
+# usage $message
+# --------------
+# output commandline usage message and quit.
+# optionally output an error message
+#
 function usage {
 
 if [ -n "$1" ]; then
@@ -49,6 +55,10 @@ exit 0
 }
 
 
+#
+# die $message
+# ------------
+# die in a nice way
 function die {
     echo
     echo "$*"
@@ -57,142 +67,24 @@ function die {
 }
 
 # all vars in CONFVARS must be set when creating or wiping, or sanitycheck() will bail out
-CONFVARS="LOCATION PRESEEDSOURCEDIR PRESEEDTARGET PRESEEDSERVER KVMHOST DNSDOMAIN VCPUS RAM SIZE PVNAME GRAPHICS NETWORK PRESEEDNAME LATESETUP OTHERSETUP NAME NETWORK HOSTNETWORKSETUP CPU OSTYPE VIRTTYPE ASKBEFORECREATE ASKBEFOREWIPE ASKBEFORESALT SALTMETHOD IP SALTMASTER LATESCRIPT PRESEEDFILES DOMAINIMAGEPATH AUTOSTARTDOMAIN AUTOSALTDOMAIN"
+CONFVARS="LOCATION PRESEEDSOURCEDIR PRESEEDTARGET PRESEEDSERVER KVMHOST DNSDOMAIN VCPUS RAM SIZE PVNAME GRAPHICS NETWORK BRIDGE PRESEEDNAME LATESETUP OTHERSETUP NAME NETWORK HOSTNETWORKSETUP CPU OSTYPE VIRTTYPE ASKBEFORECREATE ASKBEFOREWIPE ASKBEFORESALT SALTMETHOD IP SALTMASTER LATESCRIPT LATESCRIPTINJECT PRESEEDFILES DOMAINIMAGEPATH AUTOSTARTDOMAIN AUTOSALTDOMAIN INJECTPRESEED"
+
+#
+# output template
+# ---------------
+# print a default configuration file to STDOUT
+#
 function output_template {
-cat << 'EOL'
-#
-# global/default options
-#
-
-# LOCATION: installer location for webbased virt-install
-LOCATION="http://ftp.debian.org/debian/dists/squeeze/main/installer-amd64/"
-
-# PRESEEDSOURCEDIR: directory below /etc/kvmtool where preseed.cfg files are stored
-PRESEEDSOURCEDIR="preseeds"
-
-# PRESEEDTARGET: the selected preseed file, the latescript and all additional files will be copied there
-# this is done using rsync and can be a remote target. e.g. webuser@someserv.er:/srv/www/
-# make sure that you set permissions correctly beforehand, because rsync -a is used to transfer
-PRESEEDTARGET="/var/www/"
-
-# PRESEEDSERVER: URL of webserver path, where preseed and latefiles can be found
-PRESEEDSERVER="http://10.1.1.22"
-
-# SALTMASTER: IP/FQDN of saltmaster the minion shall use
-SALTMASTER="10.1.1.22"
-
-# set to exactly "NO", to suppress manual interaction
-# be very careful. you can fsck up your virtual machines without warning then
-ASKBEFORECREATE=yes
-ASKBEFOREWIPE=yes
-ASKBEFORESALT=yes
-
-# proxies to use when loading $LOCATION
-# this is not the proxy that will be used during installation in the guest!
-export http_proxy="http://10.1.1.22:8080"
-export https_proxy="http://10.1.1.22:8080"
-export ftp_proxy="http://10.1.1.22:8080"
-
-
-#
-# host settings
-#
-
-# hostname or alias of the KVM host system
-KVMHOST="yourkvmhost"
-
-# basic kvm parameters, read virt-install manpage for possible values
-CPU="host"
-VIRTTYPE="kvm"
-OSTYPE="linux"
-GRAPHICS="vnc"
-
-#
-# default kvm domain settings
-#
-DNSDOMAIN="example.com"
-VCPUS=1
-RAM=1024
-
-# SIZE: size of logical volume. In gigabytes.
-SIZE=5
-
-# AUTOSTARTDOMAIN: set to exactly "YES" to automatically start domain on boot
-AUTOSTARTDOMAIN="no"
-
-# AUTOSALTDOMAIN: automatically call salt mode after creating domain.
-# set to exactly "YES" if you want that.
-# this will wait until $IP answers to ping then delay a bit and then call salt mode
-AUTOSALTDOMAIN="no"
-
-# AUTOSALTDELAY: wait some time after fresh domain answers to ping"
-AUTOSALTDELAY="15"
-
-# PVNAME: Name of physical volume to create guest logical volumes on.
-# set to "NO" if you want to use image files
-PVNAME="vg0"
-
-# DOMAINIMAGEPATH: path where to put domain image files when not using lvm
-# will be used if PVNAME is "NO"
-DOMAINIMAGEPATH="/some/path"
-
-# PRESEEDNAME: preseed file name. without .cfg extension and path!
-PRESEEDNAME="debian_squeeze_default"
-
-# PRESEEDFILES: additional files to copy to the preseedserver
-# will be searched in config dir. do not use paths! only filenames work for now.
-PRESEEDFILES="authorized_keys"
-
-# LATESCRIPT: script to transfer to remote host and run.
-# will be searched in config dir
-# latescript will be called with the preseed server URL as first arg
-# set to NO if you do not need that
-LATESCRIPT="latescript_squeeze.sh"
-
-
-# SALTMETHOD: Method to use when installing salt on a target.
-# possible values: "squeeze","wheezy", "ubuntu" (tested with 13.04)
-SALTMETHOD="squeeze"
-
-# NETWORK: guest network hardware setup. read manual page of virt-install for details
-NETWORK="network=default"
-
-# HOSTNETWORKSETUP: network configuration for the guest. this is preseed syntax
-# also set guest system proxy here
-HOSTNETWORKSETUP="\
-interface=eth0 \
-netcfg/disable_dhcp=true \
-netcfg/disable_autoconfig=true \
-netcfg/get_nameservers=10.1.1.2 \
-netcfg/get_ipaddress=$IP \
-netcfg/get_netmask=255.255.255.0 \
-netcfg/get_gateway=10.1.1.2 \
-netcfg/confirm_static=true \
-mirror/http/proxy=http://10.1.1.22:8080 \
-"
-
-# OTHERSETUP: add additional virt-install --extra-args here. e.g. setting a default root password.
-OTHERSETUP="passwd/root-password=yourFunny24324-Password"
-
-# LATESETUP: you should not change this. use LATESCRIPT!
-LATESETUP="preseed/late_command=\"cd /tmp && for f in $LATESCRIPT $PRESEEDFILES; do wget $PRESEEDSERVER/\$f; done; sh $LATESCRIPT $PRESEEDSERVER\""
-
-#
-# host specific configuration
-# put this in host specific files
-# you may have to overwrite other vars from the global config here too!
-#
-# NAME: this name will be used as hostname and logical volume name of the guest that will be created or wiped
-#NAME=nameofvirtualmachine
-
-# IP: IP Address of guest. This IP will also be used to for salt mode
-# you can use $IP in $HOSTNETWORKSETUP like in "kvmtool template"
-#IP=
-EOL
+    cat /usr/share/kvmtool/default.template
 }
 
 
-
+#
+# sanitycheck
+# -----------
+# makes sure every variable defined in $CONFVARS is defined.
+# script bails out if not.
+#
 function sanitycheck {
     for v in $CONFVARS; do
         x=$(eval echo -n "\$$v")
@@ -203,13 +95,35 @@ function sanitycheck {
     D "configuration is valid"
 }
 
-
-function create_domain {
-    set -e 
-
+#
+# exists domain
+# -------------
+# check if domain exists, return true if so. 
+#
+function exists_domain {
     D "checking whether $NAME already exists..."
     # check whether a $name domain already exists
     if virsh -c "$KVMHOST" domid "$NAME" >/dev/null 2>&1; then
+        return 0
+    fi
+
+    return 1
+}
+
+#
+# create domain
+# -------------
+# if domain exists -> abort
+# if logical volume exists -> abort
+# if preseedfile not exists -> abort
+# if interactive, ask user whether to continue
+# run virt-install
+# if wants autostart, add to autostart
+#
+function create_domain {
+    set -e 
+
+    if exists_domain; then
         die "there already is a domain called $NAME bailing out"
     fi
 
@@ -250,18 +164,48 @@ EOL
     read
     fi 
 
-    D "copy preseed file to webserver..."
-    rsync -a "$preseedcfg" "$PRESEEDTARGET"
+    injectsetup=""
+    preseedsetup=""
 
-    if [ "$LATESETUP" == "NO" ]; then
-        LATESETUP=""
-        D "no latesetup configured"
+    if [ "$INJECTPRESEED" == "NO" ]; then
+        
+        D "copy preseed file to webserver..."
+        rsync -a "$preseedcfg" "$PRESEEDTARGET"
+        preseedurlsetup="url=\"$preseedurl\""
+        if [ "$LATESCRIPT" == "NO" ]; then
+            LATESETUP=""
+            D "no latesetup configured"
+        else
+            D "copy additional files to webserver..."
+            for f in $LATESCRIPT $PRESEEDFILES; do
+                rsync -a "$KVMTOOLCONFIGDIR/$f" "$PRESEEDTARGET"
+            done
+        fi
     else
-        D "copy additional files to webserver..."
-        for f in $LATESCRIPT $PRESEEDFILES; do
-            rsync -a "$KVMTOOLCONFIGDIR/$f" "$PRESEEDTARGET"
-        done
+        D "injecting preseed file"
+        # create temp dir, copy preseed there
+        tmpdir=$(mktemp -d)
+        preseedcfgtmp="$tmpdir/preseed.cfg"
+        cp -v "$preseedcfg" "$preseedcfgtmp"
+        injectsetup="--initrd-inject=$preseedcfgtmp"
+        if [ "$LATESCRIPTINJECT" == "NO" ]; then
+            LATESETUP=""
+            D "no latesetup configured"
+        else
+            for f in $LATESCRIPTINJECT $PRESEEDFILES; do
+                injectsetup="$injectsetup --initrd-inject=$KVMTOOLCONFIGDIR/$f"
+            done
+        fi
     fi
+
+    if [ -n "$BRIDGE" ]; then
+        networksetup="--bridge=$BRIDGE"
+        D "using bridge setup: $BRIDGE"
+    else
+        networksetup="--network=$NETWORK"
+        D "using network setup: $NETWORK"
+    fi
+
 
     D "create domain $NAME"
     time virt-install \
@@ -275,11 +219,18 @@ EOL
         --noautoconsole \
         --wait=-1 \
         --hvm \
-        --network="$NETWORK" \
         --graphics="$GRAPHICS" \
+        $networksetup \
         $disksetup \
+        $injectsetup \
         --location="$LOCATION" \
-        --extra-args="auto=true hostname=$NAME domain=$DNSDOMAIN $LATESETUP $HOSTNETWORKSETUP $OTHERSETUP url=$preseedurl"
+        --extra-args="auto=true hostname=$NAME domain=$DNSDOMAIN $LATESETUP $LATESETUPINJECT $HOSTNETWORKSETUP $OTHERSETUP $preseedsetup $preseedurlsetup"
+
+    # remove tmp files
+    if [ -n "$preseedcfgtmp" ]; then
+        rm "$preseedcfgtmp"
+        rmdir "$tmpdir"
+    fi
 
     if [ "$AUTOSTARTDOMAIN" == "YES" ]; then
         virsh --connect="$KVMHOST" "autostart $NAME"
@@ -287,25 +238,27 @@ EOL
 
 }
 
-function cmd_create {
-
-    domain="$1"
-    default="$3" 
-    [ "$2" == "like" ] || usage "create command syntax error"
-
+#
+# load config $domain $default
+# ----------------------------
+#
+function load_config {
+    local domain="$1"
+    local default="$2" 
     # load domain config
     domainconf="$KVMTOOLCONFIGDIR/$domain.conf"
     defaultconf="$KVMTOOLCONFIGDIR/$default.conf"
 
     if   [ ! -f "$domainconf" ]; then
-        die "error: $domainconf not found"
+        die "error: domainconf  $domainconf not found"
     fi
 
     if   [ ! -f "$defaultconf" ]; then
-        die "error: $defaultconf not found"
+        die "error: defaultconf $defaultconf not found"
     fi
 
     # first load domain config to allow early setup, then default config then domain config again...
+    # this helps to make all vars resolvable and to override defaults with per domain config
     source "$domainconf"
     source "$defaultconf"
     source "$domainconf"
@@ -313,25 +266,13 @@ function cmd_create {
     D "configuration loaded"
     # make sure all vars are available...
     sanitycheck
-    create_domain
-
-    if [ "$AUTOSALTDOMAIN" != "YES" ]; then
-        return 0
-    fi
-
-    # wait until it pings...
-    echo -n "going to salt, waiting for host"
-    until ping -c1 -q $IP >/dev/null; do
-        echo -n "."
-        sleep 1
-    done
-    echo
-    echo "host found. waiting for $AUTOSALTDELAY seconds..."
-    sleep "$AUTOSALTDELAY"
-    ASKBEFORESALT=NO    
-    salt_domain
 }
 
+
+#
+# wipe_domain
+# -----------
+#
 function wipe_domain {
     set -e
 
@@ -361,35 +302,11 @@ EOL
 
 }
 
-function cmd_wipe {
-    D "wipe mode $*"
-    domain="$1"
-    default="$3" 
-    [ "$2" == "like" ] || usage "wipe command syntax error"
-
-    # load domain config
-    domainconf="$KVMTOOLCONFIGDIR/$domain.conf"
-    defaultconf="$KVMTOOLCONFIGDIR/$default.conf"
-
-    if   [ ! -f "$domainconf" ]; then
-        die "error: $domainconf not found"
-    fi
-
-    if   [ ! -f "$defaultconf" ]; then
-        die "error: $defaultconf not found"
-    fi
-
-    # first load default config then domain config
-    source "$defaultconf"
-    source "$domainconf"
-
-    D "configuration loaded"
-    # make sure all vars are available...
-    sanitycheck
-    wipe_domain
-}
-
-
+#
+# salt_domain
+# -----------
+# todo: move scripts to template files
+#
 function salt_domain {
     set -e
 
@@ -406,46 +323,18 @@ EOL
     fi 
 
     script=$(mktemp)
+    # todo: make script location more configurable?!
+    # todo: is this deployment feature even needed anymore?!
     case $SALTMETHOD in
-
         wheezy)
-
-            cat >"$script" << EOL
-#!/bin/bash
-set -e
-echo "deb http://debian.saltstack.com/debian wheezy-saltstack main" >/etc/apt/sources.list.d/salt.list 
-wget -q -O- "http://debian.saltstack.com/debian-salt-team-joehealy.gpg.key" | apt-key add -
-apt-get update
-apt-get -y install salt-minion
-perl -p -i -e 's/^\#master: salt/master: $SALTMASTER/' /etc/salt/minion
-/etc/init.d/salt-minion restart
-EOL
+            cat >"$script" < /usr/share/kvmtool/salt-script.wheezy
             ;;
         squeeze)
+            cat >"$script" < /usr/share/kvmtool/salt-script.squeeze
 
-            cat >"$script" << EOL
-#!/bin/bash
-set -e
-echo "deb http://debian.saltstack.com/debian squeeze-saltstack main" >/etc/apt/sources.list.d/salt.list 
-echo "deb http://backports.debian.org/debian-backports squeeze-backports main contrib non-free" >>/etc/apt/sources.list.d/salt.list
-wget -q -O- "http://debian.saltstack.com/debian-salt-team-joehealy.gpg.key" | apt-key add -
-apt-get update
-apt-get -y install salt-minion
-perl -p -i -e 's/^\#master: salt/master: $SALTMASTER/' /etc/salt/minion
-/etc/init.d/salt-minion restart
-EOL
             ;;
         ubuntu)
-            cat >"$script" << EOL
-#!/bin/bash
-set -e
-apt-get -y install software-properties-common
-add-apt-repository -y ppa:saltstack/salt
-apt-get update
-apt-get -y install salt-minion
-perl -p -i -e 's/^\#master: salt/master: $SALTMASTER/' /etc/salt/minion
-restart salt-minion
-EOL
+            cat >"$script" < /usr/share/kvmtool/salt-script.ubuntu
         ;;
         *)
             die "unknown salting method"
@@ -459,37 +348,52 @@ EOL
     rm -v "$script"
 }
 
+#
+# cmd_create $domain "like" $default
+# ----------------------------------
+#
+function cmd_create {
+    D "create mode ($1,$2)"
+    load_config "$1" "$2"
+    create_domain
 
-function cmd_salt {
-    D "salt mode $*"
-    domain="$1"
-    default="$3" 
-    [ "$2" == "like" ] || usage "salt command syntax error"
-
-    # load domain config
-    domainconf="$KVMTOOLCONFIGDIR/$domain.conf"
-    defaultconf="$KVMTOOLCONFIGDIR/$default.conf"
-
-    if   [ ! -f "$domainconf" ]; then
-        die "error: $domainconf not found"
+    if [ "$AUTOSALTDOMAIN" != "YES" ]; then
+        return 0
     fi
 
-    if   [ ! -f "$defaultconf" ]; then
-        die "error: $defaultconf not found"
-    fi
-
-    # first load default config then domain config
-    source "$defaultconf"
-    source "$domainconf"
-
-    D "configuration loaded"
-    # make sure all vars are available...
-    sanitycheck
+    # wait until it pings...
+    # todo: add a maximum waiting time?
+    echo -n "going to salt, waiting for host"
+    until ping -c1 -q $IP >/dev/null; do
+        echo -n "."
+        sleep 1
+    done
+    echo
+    echo "host found. waiting for $AUTOSALTDELAY seconds..."
+    sleep "$AUTOSALTDELAY"
+    ASKBEFORESALT=NO    
     salt_domain
 }
 
-function D {
-    echo "$*" 1>&2
+#
+# cmd_wipe $domain $default
+# --------------------------------
+#
+function cmd_wipe {
+    D "wipe mode ($1,$2)"
+    load_config "$1" "$2"
+    wipe_domain
+}
+
+
+#
+# cmd_salt $domain $default
+# --------------------------------
+#
+function cmd_salt { 
+    D "salt mode ($1,$2)"
+    load_config "$1" "$2"
+    salt_domain
 }
 
 #
@@ -506,15 +410,18 @@ fi
 
 case $mode in
     create)
-        cmd_create "$1" "$2" "$3"
+        [ "$2" == "like" ] || usage "create command syntax error"
+        cmd_create "$1" "$3"
         exit 0
         ;;
     wipe)
-        cmd_wipe "$1" "$2" "$3"
+        [ "$2" == "like" ] || usage "wipe command syntax error"
+        cmd_wipe "$1" "$3"
         exit 0
         ;;
     salt)
-        cmd_salt "$1" "$2" "$3"
+        [ "$2" == "like" ] || usage "salt command syntax error"
+        cmd_salt "$1" "$3"
         ;;
     template)
         output_template
