@@ -118,6 +118,10 @@ SALTMETHOD="wheezy"
 # NETWORK: guest network hardware setup. read manual page of virt-install for details
 NETWORK="network=default"
 
+# BRIDGE: use this bridge instead of a network setup. set to "" to use NETWORK
+# BRIDGE="br4711"
+BRIDGE=""
+
 # HOSTNETWORKSETUP: network configuration for the guest. this is preseed syntax
 # also set guest system proxy here
 HOSTNETWORKSETUP="\
