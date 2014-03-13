@@ -3,7 +3,7 @@
 #
 
 # LOCATION: installer location for webbased virt-install
-LOCATION="http://ftp.debian.org/debian/dists/squeeze/main/installer-amd64/"
+LOCATION="http://ftp.debian.org/debian/dists/wheezy/main/installer-amd64/"
 
 # iso image based installation does not work well with automated installation,
 # so the feature is not implemented.
