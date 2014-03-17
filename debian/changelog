@@ -1,22 +1,25 @@
-kvmtool (0.7-115) UNRELEASED; urgency=low
+kvmtool (0.7.4) stable; urgency=low
 
-  [ Robert Einsle ]
   * new release
 
-  [ Matthias Nuessle ]
-  * new release
+ -- Matthias Nuessle <matthias.nuessle@mawoh.de>  Thu, 13 Mar 2014 17:54:45 +0100
+
+kvmtool (0.7.3) stable; urgency=low
+
   * new release
 
- -- Matthias Nuessle <matthias.nuessle@mawoh.de>  Tue, 07 Jan 2014 13:00:07 +0100
+ -- Matthias Nuessle <matthias.nuessle@mawoh.de>  Wed, 05 Feb 2014 17:59:05 +0100
+
+kvmtool (0.7.2) stable; urgency=low
+
+  * new release 0.7.1 build 140
+  * new release 0.7.2 build 140
+
+ -- Matthias Nuessle <matthias.nuessle@mawoh.de>  Wed, 05 Feb 2014 11:29:14 +0100
 
 kvmtool (0.6-93) UNRELEASED; urgency=low
 
   * new release
-  * new release
-  * new release
-  * new release
-  * new release
-
  -- Matthias Nuessle <matthias.nuessle@mawoh.de>  Thu, 09 May 2013 19:16:36 +0200
 
 kvmtool (0.4-79) UNRELEASED; urgency=low
@@ -64,20 +67,7 @@ kvmtool (0.2-53) UNRELEASED; urgency=low
 kvmtool (0.1-50) UNRELEASED; urgency=low
 
   * new release
-  * new release
-  * new release
-  * new release
-  * new release
-  * new release
-  * new release
-  * new release
-  * new release
-  * new release
-  * new release
-  * new release
-  * new release
-  * new release
-
+ 
  -- Matthias Nuessle <matthias.nuessle@mawoh.de>  Mon, 06 May 2013 01:20:13 +0200
 
 kvmtool (0.1) unstable; urgency=low

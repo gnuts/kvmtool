@@ -1,0 +1,161 @@
+#
+# global/default options
+#
+
+# LOCATION: installer location for webbased virt-install
+LOCATION="http://ftp.debian.org/debian/dists/wheezy/main/installer-amd64/"
+
+# iso image based installation does not work well with automated installation,
+# so the feature is not implemented.
+# ### CDROM: location of iso image to use for installation
+# ### if this is "", LOCATION will be used
+# ### CDROM="/var/lib/libvirt/images/debian-7.3.0-amd64-netinst.iso"
+
+# PRESEEDSOURCEDIR: directory below /etc/kvmtool where preseed.cfg files are stored
+PRESEEDSOURCEDIR="preseeds"
+
+# PRESEEDTARGET: the selected preseed file, the latescript and all additional files will be copied there
+# this is done using rsync and can be a remote target. e.g. webuser@someserv.er:/srv/www/
+# make sure that you set permissions correctly beforehand, because rsync -a is used to transfer
+PRESEEDTARGET="/var/www/"
+
+# PRESEEDSERVER: URL of webserver path, where preseed and latefiles can be found
+PRESEEDSERVER="http://10.1.1.22"
+
+# SALTMASTER: IP/FQDN of saltmaster the minion shall use
+SALTMASTER="10.1.1.22"
+
+# set to exactly "NO", to suppress manual interaction
+# be very careful. you can fsck up your virtual machines without warning then
+ASKBEFORECREATE=yes
+ASKBEFOREWIPE=yes
+ASKBEFORESALT=yes
+
+# if INJECTPRESEED is set PRESEEDSERVER is not used and
+# the preseed file is instead injected with --initrd-inject
+# set to exaktly "NO" if you want to use PRESEEDSERVER
+INJECTPRESEED=yes
+
+
+
+# proxies to use when loading $LOCATION
+# this is not the proxy that will be used during installation in the guest!
+export http_proxy="http://10.1.1.22:8080"
+export https_proxy="http://10.1.1.22:8080"
+export ftp_proxy="http://10.1.1.22:8080"
+
+
+#
+# host settings
+#
+
+# hostname or alias of the KVM host system
+KVMHOST="yourkvmhost"
+
+# basic kvm parameters, read virt-install manpage for possible values
+CPU="host"
+VIRTTYPE="kvm"
+OSTYPE="linux"
+GRAPHICS="vnc"
+
+#
+# default kvm domain settings
+#
+#
+# default kvm domain settings
+#
+DNSDOMAIN="example.com"
+VCPUS=1
+RAM=1024
+
+# SIZE: size of logical volume. In gigabytes.
+SIZE=5
+
+# AUTOSTARTDOMAIN: set to exactly "YES" to automatically start domain on boot
+AUTOSTARTDOMAIN="no"
+
+# AUTOSALTDOMAIN: automatically call salt mode after creating domain.
+# set to exactly "YES" if you want that.
+# this will wait until $IP answers to ping then delay a bit and then call salt mode
+AUTOSALTDOMAIN="no"
+
+# AUTOSALTDELAY: wait some time after fresh domain answers to ping"
+AUTOSALTDELAY="15"
+
+# PVNAME: Name of physical volume to create guest logical volumes on.
+# set to "NO" if you want to use image files
+PVNAME="vg0"
+
+# DOMAINIMAGEPATH: path where to put domain image files when not using lvm
+# will be used if PVNAME is "NO"
+DOMAINIMAGEPATH="/some/path"
+
+# PRESEEDNAME: preseed file name. without .cfg extension and path!
+PRESEEDNAME="debian_wheezy_default"
+
+# PRESEEDFILES: additional files to copy to the preseedserver
+# will be searched in config dir. do not use paths! only filenames work for now.
+PRESEEDFILES="authorized_keys"
+
+# LATESCRIPT: script to transfer to remote host and run if INJECTPRESEED is NOT set
+# will be searched in config dir
+# latescript will be called with the preseed server URL as first arg
+# set to exactly "NO" if you do not need that
+LATESCRIPT="latescript_wheezy.sh"
+
+# LATESCRIPTINJECT: script to inject if INJECTPRESEED is set
+# will be searched in config dir
+# latescriptinject will be called with no arguments
+# all preseedfiles and the script are found directly in /
+# all preseedfiles and the script will be deleted after execution
+# set to exactly "NO" to disable
+LATESCRIPTINJECT="latescript_inject.sh"
+
+# SALTMETHOD: Method to use when installing salt on a target.
+# possible values: "squeeze","wheezy", "ubuntu" (tested with 13.04)
+SALTMETHOD="wheezy"
+
+# NETWORK: guest network hardware setup. read manual page of virt-install for details
+NETWORK="network=default"
+
+# BRIDGE: use this bridge instead of a network setup. set to "" to use NETWORK
+# BRIDGE="br4711"
+BRIDGE=""
+
+# HOSTNETWORKSETUP: network configuration for the guest. this is preseed syntax
+# also set guest system proxy here
+HOSTNETWORKSETUP="\
+interface=eth0 \
+netcfg/disable_dhcp=true \
+netcfg/disable_autoconfig=true \
+netcfg/get_nameservers=10.1.1.2 \
+netcfg/get_ipaddress=$IP \
+netcfg/get_netmask=255.255.255.0 \
+netcfg/get_gateway=10.1.1.2 \
+netcfg/confirm_static=true \
+mirror/http/proxy=http://10.1.1.22:8080 \
+"
+
+# OTHERSETUP: add additional virt-install --extra-args here. e.g. setting a default root password.
+OTHERSETUP="passwd/root-password=yourFunny24324-Password"
+
+# LATESETUP: you should not change this. use LATESCRIPT to run stuff directly after installation!
+LATESETUP="preseed/late_command=\"cd /tmp && for f in $LATESCRIPT $PRESEEDFILES; do wget $PRESEEDSERVER/\$f; done; sh $LATESCRIPT $PRESEEDSERVER\""
+#
+# LATESETUPINJECT: you should not change this. use LATESCRIPTINJECT to run stuff directly after installation!
+LATESETUPINJECT="preseed/late_command=\"cd / && sh $LATESCRIPT\" && rm $LATESCRIPT $PRESEEDFILES"
+
+
+#
+# host specific configuration
+# put this in host specific files
+# you may have to overwrite other vars from the global config here too!
+#
+# NAME: this name will be used as hostname and logical volume name of the guest that will be created or wiped
+#NAME=nameofvirtualmachine
+
+# IP: IP Address of guest. This IP will also be used to for salt mode
+# you can use $IP in $HOSTNETWORKSETUP like in "kvmtool template"
+#IP=
+
+
