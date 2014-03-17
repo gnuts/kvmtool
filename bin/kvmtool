@@ -169,6 +169,7 @@ EOL
 
     if [ "$INJECTPRESEED" == "NO" ]; then
         
+        LATESETUPINJECT=""
         D "copy preseed file to webserver..."
         rsync -a "$preseedcfg" "$PRESEEDTARGET"
         preseedurlsetup="url=\"$preseedurl\""
@@ -182,6 +183,7 @@ EOL
             done
         fi
     else
+        LATESETUP=""
         D "injecting preseed file"
         # create temp dir, copy preseed there
         tmpdir=$(mktemp -d)
@@ -189,7 +191,7 @@ EOL
         cp -v "$preseedcfg" "$preseedcfgtmp"
         injectsetup="--initrd-inject=$preseedcfgtmp"
         if [ "$LATESCRIPTINJECT" == "NO" ]; then
-            LATESETUP=""
+            LATESETUPINJECT=""
             D "no latesetup configured"
         else
             for f in $LATESCRIPTINJECT $PRESEEDFILES; do

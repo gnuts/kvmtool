@@ -143,7 +143,7 @@ OTHERSETUP="passwd/root-password=yourFunny24324-Password"
 LATESETUP="preseed/late_command=\"cd /tmp && for f in $LATESCRIPT $PRESEEDFILES; do wget $PRESEEDSERVER/\$f; done; sh $LATESCRIPT $PRESEEDSERVER\""
 #
 # LATESETUPINJECT: you should not change this. use LATESCRIPTINJECT to run stuff directly after installation!
-LATESETUPINJECT="preseed/late_command=\"cd / && sh $LATESCRIPT\" && rm $LATESCRIPT $PRESEEDFILES"
+LATESETUPINJECT="preseed/late_command=\"cd / && sh $LATESCRIPTINJECT\" && rm $LATESCRIPTINJECT $PRESEEDFILES"
 
 
 #
