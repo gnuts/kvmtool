@@ -1,0 +1,8 @@
+#!/bin/bash
+set -e
+echo "deb http://debian.saltstack.com/debian wheezy-saltstack main" >/etc/apt/sources.list.d/salt.list 
+wget -q -O- "http://debian.saltstack.com/debian-salt-team-joehealy.gpg.key" | apt-key add -
+apt-get update
+apt-get -y install salt-minion
+perl -p -i -e 's/^\#master: salt/master: $SALTMASTER/' /etc/salt/minion
+/etc/init.d/salt-minion restart

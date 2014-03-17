@@ -1,0 +1,8 @@
+#!/bin/bash
+set -e
+apt-get -y install software-properties-common
+add-apt-repository -y ppa:saltstack/salt
+apt-get update
+apt-get -y install salt-minion
+perl -p -i -e 's/^\#master: salt/master: $SALTMASTER/' /etc/salt/minion
+restart salt-minion
