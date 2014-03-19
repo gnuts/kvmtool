@@ -200,9 +200,13 @@ EOL
         fi
     fi
 
+    networksetup=""
+
     if [ -n "$BRIDGE" ]; then
-        networksetup="--bridge=$BRIDGE"
-        D "using bridge setup: $BRIDGE"
+        for n in $BRIDGE; do
+            networksetup="$networksetup --netowrk bridge=$n"
+            D "using bridge setup: $n"
+        done
     else
         networksetup="--network=$NETWORK"
         D "using network setup: $NETWORK"
