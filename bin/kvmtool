@@ -204,7 +204,7 @@ EOL
 
     if [ -n "$BRIDGE" ]; then
         for n in $BRIDGE; do
-            networksetup="$networksetup --netowrk bridge=$n"
+            networksetup="$networksetup --network bridge=$n"
             D "using bridge setup: $n"
         done
     else
