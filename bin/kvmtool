@@ -361,7 +361,7 @@ EOL
     set -e
     D "created script $script"
     ssh="ssh -Cl root -o stricthostkeychecking=no $IP"
-    $ssh 'f=$(mktemp) && cat >$f && echo "remote script: $f" && chmod +x $f && $f && rm -v $f' < $script
+    $ssh 'f=$(mktemp) && cat >$f && echo "remote script: $f" && chmod +x $f && $f $SALTMASTER && rm -v $f' < $script
     rm -v "$script"
 }
 

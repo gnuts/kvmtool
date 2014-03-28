@@ -1,5 +1,13 @@
 #!/bin/bash
 set -e
+
+SALTMASTER="$1"
+
+if [ -z "$1" ]; then
+    echo "first argument must be the saltmaster address"
+    exit 1
+fi
+
 echo "deb http://debian.saltstack.com/debian squeeze-saltstack main" >/etc/apt/sources.list.d/salt.list 
 echo "deb http://backports.debian.org/debian-backports squeeze-backports main contrib non-free" >>/etc/apt/sources.list.d/salt.list
 wget -q -O- "http://debian.saltstack.com/debian-salt-team-joehealy.gpg.key" | apt-key add -
