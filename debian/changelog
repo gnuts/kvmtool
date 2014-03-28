@@ -1,3 +1,9 @@
+kvmtool (0.8.1) stable; urgency=low
+
+  * new release
+
+ -- Matthias Nuessle <matthias.nuessle@mawoh.de>  Fri, 28 Mar 2014 11:57:19 +0100
+
 kvmtool (0.7.4) stable; urgency=low
 
   * new release

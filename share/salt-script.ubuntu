@@ -1,5 +1,13 @@
 #!/bin/bash
 set -e
+
+SALTMASTER="$1"
+
+if [ -z "$1" ]; then
+    echo "first argument must be the saltmaster address"
+    exit 1
+fi
+
 apt-get -y install software-properties-common
 add-apt-repository -y ppa:saltstack/salt
 apt-get update

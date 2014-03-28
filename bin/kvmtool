@@ -169,6 +169,7 @@ EOL
 
     if [ "$INJECTPRESEED" == "NO" ]; then
         
+        LATESETUPINJECT=""
         D "copy preseed file to webserver..."
         rsync -a "$preseedcfg" "$PRESEEDTARGET"
         preseedurlsetup="url=\"$preseedurl\""
@@ -182,6 +183,7 @@ EOL
             done
         fi
     else
+        LATESETUP=""
         D "injecting preseed file"
         # create temp dir, copy preseed there
         tmpdir=$(mktemp -d)
@@ -189,7 +191,7 @@ EOL
         cp -v "$preseedcfg" "$preseedcfgtmp"
         injectsetup="--initrd-inject=$preseedcfgtmp"
         if [ "$LATESCRIPTINJECT" == "NO" ]; then
-            LATESETUP=""
+            LATESETUPINJECT=""
             D "no latesetup configured"
         else
             for f in $LATESCRIPTINJECT $PRESEEDFILES; do
@@ -198,12 +200,27 @@ EOL
         fi
     fi
 
+    networksetup=""
+
     if [ -n "$BRIDGE" ]; then
-        networksetup="--bridge=$BRIDGE"
-        D "using bridge setup: $BRIDGE"
+        for n in $BRIDGE; do
+            networksetup="$networksetup --network bridge=$n"
+            D "using bridge setup: $n"
+        done
     else
         networksetup="--network=$NETWORK"
         D "using network setup: $NETWORK"
+    fi
+
+    graphicssetup=""
+    if [ "$GRAPHICS" == "vnc" ]; then
+        if [ -n "$VNCLISTENIP" ]; then
+            graphicssetup="--graphics vnc,listen=$VNCLISTENIP"
+        else
+            graphicssetup="--graphics vnc"
+        fi
+    else
+        graphicssetup="--graphics $GRAPHICS"
     fi
 
 
@@ -219,7 +236,7 @@ EOL
         --noautoconsole \
         --wait=-1 \
         --hvm \
-        --graphics="$GRAPHICS" \
+        $graphicssetup \
         $networksetup \
         $disksetup \
         $injectsetup \
@@ -344,7 +361,7 @@ EOL
     set -e
     D "created script $script"
     ssh="ssh -Cl root -o stricthostkeychecking=no $IP"
-    $ssh 'f=$(mktemp) && cat >$f && echo "remote script: $f" && chmod +x $f && $f && rm -v $f' < $script
+    $ssh 'f=$(mktemp) && cat >$f && echo "remote script: $f" && chmod +x $f && $f $SALTMASTER && rm -v $f' < $script
     rm -v "$script"
 }
 

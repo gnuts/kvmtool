@@ -3,8 +3,9 @@
 PNAME    		= kvmtool
 PDESC    		= kvmtool - automatically create and wipe kvm domains, add salt to domains
 
-REPOSITORY 		= ispconfig.mawoh.org
-REPODIR 		= /var/www/clients/client1/web22/web
+REPOSITORY 		= deb.mawoh.org
+REPODIR 		= /var/www/deb.mawoh.org/web
+REPONAME		= mawoh
 
 DESTDIR 		?= /
 USRPREFIX  		?= /usr
@@ -102,11 +103,11 @@ debian-package:
 
 move-packages:
 	@mkdir -p ../packages
-	@mv -v ../$(PNAME)_* ../packages
+	@mv -v ../$(PNAME)_* ../packages || true
 	@echo ""
 	@echo ""
 	@echo "latest package:"
-	@ls -lrt ../packages/*.deb|tail -n1
+	@ls -lrt ../packages/$(PNAME)_*.deb|tail -n1
 
 release: set-debian-release
 set-debian-release:
@@ -139,8 +140,8 @@ version: status
 status:
 	@echo "this is $(PNAME) $(DEBVERSION) build $(BUILD)"
 
-#upload: move-packages
-#	rsync -vP ../stable/*deb root@$(REPOSITORY):/tmp/ 
-#	ssh -l root $(REPOSITORY) 'cd $(REPODIR) && for f in /tmp/*deb; do reprepro includedeb squeeze $$f;done'
-#
+upload: move-packages
+	rsync -vP ../packages/$(PNAME)_$(DEBVERSION)_*.deb root@$(REPOSITORY):/tmp/ 
+	ssh -l root $(REPOSITORY) 'cd $(REPODIR) && for f in /tmp/*deb; do reprepro includedeb $(REPONAME) $$f && rm -v $$f;done'
+
 
