@@ -212,6 +212,17 @@ EOL
         D "using network setup: $NETWORK"
     fi
 
+    graphicssetup=""
+    if [ "$GRAPHICS" == "vnc" ]; then
+        if [ -n "$VNCLISTENIP" ]; then
+            graphicssetup="--graphics vnc,listen=$VNCLISTENIP"
+        else
+            graphicssetup="--graphics vnc"
+        fi
+    else
+        graphicssetup="--graphics $GRAPHICS"
+    fi
+
 
     D "create domain $NAME"
     time virt-install \
@@ -225,7 +236,7 @@ EOL
         --noautoconsole \
         --wait=-1 \
         --hvm \
-        --graphics="$GRAPHICS" \
+        $graphicssetup \
         $networksetup \
         $disksetup \
         $injectsetup \
