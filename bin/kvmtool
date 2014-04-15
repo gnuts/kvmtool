@@ -202,7 +202,7 @@ EOL
 
     networksetup=""
 
-    if [ -n "$BRIDGE" ]; then
+    if [ "$BRIDGE" != "NO" ]; then
         for n in $BRIDGE; do
             networksetup="$networksetup --network bridge=$n"
             D "using bridge setup: $n"
